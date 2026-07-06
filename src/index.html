@@ -128,7 +128,7 @@ import { esc, isAdult as sdkIsAdult, memberColor, initial, hubConfirm } from "/h
 import { sendHubNotification, hubAppUrl } from "/hub-sdk.js";
 import {
   toMinutes, minutesToLabel, entryStatus, isConfirmed, needsMyConfirmation,
-  computeBalances, claimCount, isFull, canClaim, claimErrorMessage,
+  computeBalances, confirmedMinutes, claimCount, isFull, canClaim, claimErrorMessage,
 } from "./logic.js";
 
 const CONTEXT = window.__CONTEXT_URL ?? "";
@@ -624,9 +624,12 @@ function renderEntryRow(entry) {
   const iAmSitter = entry.sitter_id === me?.id;
   const counterId = iAmSitter ? entry.parent_id : entry.sitter_id;
   const counterName = iAmSitter ? entry.parent_name : entry.sitter_name;
+  // Show the frozen snapshot amount for confirmed entries so the displayed value
+  // always matches what the balance counts (a post-confirmation edit is ignored).
+  const shownMinutes = confirmed ? confirmedMinutes(agreement, entry) : entry.minutes;
   const dir = iAmSitter
-    ? `<span class="pill good">You earned +${esc(minutesToLabel(entry.minutes))}</span>`
-    : `<span class="pill warn">You owe ${esc(minutesToLabel(entry.minutes))}</span>`;
+    ? `<span class="pill good">You earned +${esc(minutesToLabel(shownMinutes))}</span>`
+    : `<span class="pill warn">You owe ${esc(minutesToLabel(shownMinutes))}</span>`;
   const statusPill = confirmed
     ? `<span class="pill good">Confirmed</span>`
     : `<span class="pill info">Pending</span>`;

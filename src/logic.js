@@ -78,8 +78,14 @@ export function computeBalances(entries, agreementsById, meId) {
   const partners = new Map(); // partnerId -> { partnerId, partnerName, net }
 
   for (const e of entries || []) {
-    if (!isConfirmed(agreementsById.get?.(e.id) ?? agreementsById[e.id])) continue;
-    const mins = Math.max(0, Math.round(Number(e.minutes) || 0));
+    const agreement = agreementsById.get?.(e.id) ?? agreementsById[e.id];
+    if (!isConfirmed(agreement)) continue;
+    // Once confirmed, the credited amount is frozen in the endpoint_only
+    // ledger_agreements snapshot (minutes). A post-confirmation edit to the
+    // party_scoped ledger_entries.minutes via raw /api/db must NOT change the
+    // balance — always prefer the snapshot for confirmed entries.
+    const source = confirmedMinutes(agreement, e);
+    const mins = Math.max(0, Math.round(Number(source) || 0));
     if (e.sitter_id === meId) {
       earned += mins;
       bump(partners, e.parent_id, e.parent_name, mins);
@@ -94,6 +100,16 @@ export function computeBalances(entries, agreementsById, meId) {
     .sort((a, b) => Math.abs(b.net) - Math.abs(a.net));
 
   return { earned, spent, net: earned - spent, byPartner };
+}
+
+/**
+ * The authoritative minute count for a confirmed entry: the frozen snapshot on
+ * the (endpoint_only) agreement row when present, else the entry's own value
+ * (pending entries, or rows predating the snapshot column).
+ */
+export function confirmedMinutes(agreement, entry) {
+  const snap = agreement?.minutes;
+  return snap != null && snap !== "" ? snap : entry?.minutes;
 }
 
 function bump(map, partnerId, partnerName, delta) {

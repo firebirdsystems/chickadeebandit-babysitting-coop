@@ -61,7 +61,8 @@
       "locked_at_column": "locked_at",
       "updated_at_column": "updated_at",
       "init_from_table": "ledger_entries",
-      "init_columns": ["sitter_id", "parent_id"]
+      "init_columns": ["sitter_id", "parent_id"],
+      "snapshot_columns": ["minutes"]
     }
   },
   "publishes": ["babysitting.coverage_posted", "babysitting.hours_confirmed"],
