@@ -1,0 +1,82 @@
+{
+  "id": "babysitting-coop",
+  "name": "Babysitting Co-op Ledger",
+  "version": "1.0.0",
+  "description": "A points ledger for a babysitting-exchange co-op — log the hours you sat for another household, have them confirm it, and track who owes whom. Post coverage requests other members can claim.",
+  "entrypoint": "index.html",
+  "runtime": "static",
+  "category": "organization",
+  "tags": ["babysitting", "co-op", "ledger", "hours", "slot-claims", "agreements"],
+  "data_access": {
+    "reads": ["family.members"],
+    "writes": []
+  },
+  "permissions": {
+    "default_audience": "adults",
+    "requires_approval": false
+  },
+  "storage": "db",
+  "db_plaintext_columns": ["capacity", "date", "note"],
+  "row_policies": {
+    "coverage_requests": {
+      "kind": "adult_writable"
+    },
+    "coverage_claims": {
+      "kind": "endpoint_only",
+      "read": "everyone"
+    },
+    "ledger_entries": {
+      "kind": "party_scoped",
+      "member_columns": ["sitter_id", "parent_id"],
+      "self_column": "sitter_id"
+    },
+    "ledger_agreements": {
+      "kind": "endpoint_only",
+      "read": "adult"
+    }
+  },
+  "slot_claims": {
+    "slot_table": "coverage_requests",
+    "slot_id_column": "id",
+    "capacity_column": "capacity",
+    "slot_status_column": "status",
+    "slot_open_values": ["open"],
+    "claims_table": "coverage_claims",
+    "claim_id_column": "id",
+    "slot_fk_column": "request_id",
+    "member_column": "member_id",
+    "created_at_column": "claimed_at",
+    "one_claim_per_member": true,
+    "allow_release": true,
+    "allowed_columns": ["note"],
+    "max_text_lengths": { "note": 200 }
+  },
+  "agreements": {
+    "ledger_agreements": {
+      "participant_columns": ["sitter_id", "parent_id"],
+      "agreement_columns": { "sitter_id": "sitter_agreed", "parent_id": "parent_agreed" },
+      "status_column": "status",
+      "pending_value": "pending",
+      "locked_value": "locked",
+      "locked_at_column": "locked_at",
+      "updated_at_column": "updated_at",
+      "init_from_table": "ledger_entries",
+      "init_columns": ["sitter_id", "parent_id"]
+    }
+  },
+  "publishes": ["babysitting.coverage_posted", "babysitting.hours_confirmed"],
+  "publish_acls": {
+    "babysitting.coverage_posted": { "require_role": "adult" },
+    "babysitting.hours_confirmed": { "require_role": "adult" }
+  },
+  "nav": { "label": "Babysitting" },
+  "resource_limits": {
+    "max_db_bytes": 52428800
+  },
+  "icon": "🍼",
+  "ai_access": {
+    "allowed": true,
+    "mode": "read",
+    "db_exports": ["open_coverage", "recent_claims"]
+  }
+}
