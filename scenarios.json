@@ -1,0 +1,75 @@
+{
+  "scenarios": [
+    {
+      "name": "a ledger entry is visible only to its sitter and parent, and insert forces the sitter to be the caller",
+      "members": { "sitter": "adult", "parent": "adult", "other": "adult" },
+      "steps": [
+        {
+          "action": "db",
+          "as": "sitter",
+          "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, created_at) VALUES ('l1', ?, 'Sitter', ?, 'Parent', 90, '2026-01-01', '2026-01-01T00:00:00Z')",
+          "params": ["{{other}}", "{{parent}}"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "sitter",
+          "sql": "SELECT sitter_id FROM app_babysitting_coop__ledger_entries WHERE id = 'l1'",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "sitter_id": "scn-sitter" }] }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "SELECT id FROM app_babysitting_coop__ledger_entries WHERE id = 'l1'",
+          "expect": { "status": 200, "rowCount": 1 }
+        },
+        {
+          "action": "db",
+          "as": "other",
+          "sql": "SELECT id FROM app_babysitting_coop__ledger_entries WHERE id = 'l1'",
+          "expect": { "status": 200, "rowCount": 0 }
+        }
+      ]
+    },
+    {
+      "name": "confirmed minutes are frozen in the endpoint_only agreements table, are adult-only to read, and cannot be edited by shifting the ledger entry",
+      "members": { "sitter": "adult", "parent": "adult", "kid": "child" },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, created_at) VALUES ('l1', ?, 'Sitter', ?, 'Parent', 90, '2026-01-01', '2026-01-01T00:00:00Z')",
+          "params": ["{{sitter}}", "{{parent}}"]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES ('l1', ?, ?, 1, 1, 'locked', '2026-01-02T00:00:00Z', '2026-01-02T00:00:00Z', 90)",
+          "params": ["{{sitter}}", "{{parent}}"]
+        },
+        {
+          "action": "db",
+          "as": "sitter",
+          "sql": "UPDATE app_babysitting_coop__ledger_entries SET minutes = 999 WHERE id = 'l1'",
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "SELECT minutes FROM app_babysitting_coop__ledger_agreements WHERE id = 'l1'",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "minutes": 90 }] }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "SELECT minutes FROM app_babysitting_coop__ledger_agreements WHERE id = 'l1'",
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "sitter",
+          "sql": "UPDATE app_babysitting_coop__ledger_agreements SET minutes = 999 WHERE id = 'l1'",
+          "expect": { "status": 403, "errorIncludes": "endpoint" }
+        }
+      ]
+    }
+  ]
+}
