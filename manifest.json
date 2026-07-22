@@ -1,5 +1,6 @@
 {
   "id": "babysitting-coop",
+  "contexts": ["household", "shared_space"],
   "name": "Babysitting Co-op Ledger",
   "version": "1.0.0",
   "description": "A points ledger for a babysitting-exchange co-op — log the hours you sat for another household, have them confirm it, and track who owes whom. Post coverage requests other members can claim.",
