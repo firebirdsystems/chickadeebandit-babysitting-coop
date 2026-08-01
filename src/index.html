@@ -115,6 +115,13 @@
     .notice { background: var(--green-soft); color: var(--green); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
     .two { display: grid; gap: 10px; }
     @media (min-width: 560px) { .two { grid-template-columns: 1fr 1fr; } }
+    .search-row { margin-bottom: 12px; }
+    .search-input {
+      width: 100%; border: 1.5px solid var(--border-mid, var(--border, #d1d5db));
+      border-radius: 8px; padding: 9px 11px; font: inherit;
+      background: var(--surface, var(--card, #fff)); color: var(--text, inherit);
+    }
+    .search-input:focus { outline: none; border-color: var(--accent, #6366f1); }
   </style>
   <base href="/run/babysitting-coop/">
 </head>
@@ -124,11 +131,11 @@
 </div>
 
 <script type="module">
-import { esc, isAdult as sdkIsAdult, memberColor, initial, hubConfirm } from "/hub-sdk.js";
+import { esc, isAdult as sdkIsAdult, memberColor, initial, hubConfirm, searchMatch } from "/hub-sdk.js";
 import { sendHubNotification, hubAppUrl } from "/hub-sdk.js";
 import {
   toMinutes, minutesToLabel, entryStatus, isConfirmed, needsMyConfirmation,
-  computeBalances, confirmedMinutes, claimCount, isFull, canClaim, claimErrorMessage,
+  computeBalances, confirmedMinutes, claimCount, isFull, canClaim, claimErrorMessage, searchableFields,
 } from "./logic.js";
 
 const CONTEXT = window.__CONTEXT_URL ?? "";
@@ -150,6 +157,7 @@ let members = [];
 let memberMap = new Map();
 let me = null;
 let requests = [];
+let searchQ = "";       // in-app search (see logic.js searchableFields)
 let claims = [];
 let entries = [];
 let agreements = [];              // array of agreement rows
@@ -654,9 +662,20 @@ function renderEntryRow(entry) {
     </div>`;
 }
 
+// The view is drawn whole, so put the caret back after typing.
+document.addEventListener("input", (e) => {
+  if (e.target.id !== "search") return;
+  searchQ = e.target.value;
+  const caret = e.target.selectionStart;
+  render();
+  const next = document.getElementById("search");
+  if (next) { next.focus(); next.setSelectionRange(caret, caret); }
+});
+
 function renderLedger() {
   const pending = entries.filter(e => needsMyConfirmation(e, agreementsById.get(e.id), me?.id) && e.parent_id === me?.id);
-  const rest = entries.filter(e => !pending.includes(e));
+  const all = entries.filter(e => !pending.includes(e));
+  const rest = searchQ ? all.filter(e => searchMatch(searchQ, searchableFields(e))) : all;
   return `
     ${renderBalance()}
     ${pending.length ? `
@@ -666,8 +685,9 @@ function renderLedger() {
       <h2>History</h2>
       ${isAdult(me) ? `<button class="btn btn-sm" data-log>Log hours</button>` : ""}
     </div>
+    ${all.length ? `<div class="search-row"><input id="search" class="search-input" type="search" placeholder="Search the ledger…" aria-label="Search the ledger" value="${esc(searchQ)}" /></div>` : ""}
     <section class="stack">
-      ${rest.length ? rest.map(renderEntryRow).join("") : `<div class="card empty">No sittings logged yet.</div>`}
+      ${rest.length ? rest.map(renderEntryRow).join("") : `<div class="card empty">${searchQ ? `No sittings match "${esc(searchQ)}".` : "No sittings logged yet."}</div>`}
     </section>`;
 }
 

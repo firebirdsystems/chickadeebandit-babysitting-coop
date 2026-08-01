@@ -149,3 +149,12 @@ export function claimErrorMessage(json) {
     default: return (json && json.error) || "Could not claim that request.";
   }
 }
+
+/**
+ * Fields the in-app search matches against (see hub-sdk `searchMatch`).
+ * Notes and which kids were covered count as well as the title — a
+ * past sitting is looked up by who was minded.
+ */
+export function searchableFields(item) {
+  return [item.title, item.notes, item.kids, item.requester_name];
+}

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   toMinutes, minutesToLabel, entryStatus, isConfirmed, needsMyConfirmation,
-  computeBalances, claimCount, isFull, canClaim, claimErrorMessage, canLogHours,
+  computeBalances, claimCount, isFull, canClaim, claimErrorMessage, canLogHours, searchableFields,
 } from "../src/logic.js";
 
 describe("time helpers", () => {
@@ -121,5 +121,13 @@ describe("canLogHours mirrors adult_writable / party_scoped adult use", () => {
     expect(canLogHours({ role: "adult" })).toBe(true);
     expect(canLogHours({ role: "child" })).toBe(false);
     expect(canLogHours(null)).toBe(false);
+  });
+});
+
+describe("searchableFields", () => {
+  it("matches on the notes and which kids were covered", () => {
+    const fields = searchableFields({ title: "Friday evening", notes: "bedtime done", kids: "Mia and Sam", requester_name: "Ada" });
+    expect(fields).toContain("Mia and Sam");
+    expect(fields).toContain("bedtime done");
   });
 });
