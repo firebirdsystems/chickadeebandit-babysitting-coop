@@ -89,6 +89,14 @@
     ]
   },
   "nav": { "label": "Babysitting" },
+  "agenda": {
+    "kind": "event",
+    "label": "Coverage",
+    "source": {
+      "kind": "sql",
+      "query": "SELECT id AS id, title AS title, NULLIF(kids, '') AS subtitle, date AS when_at, requester_id AS member_id FROM app_babysitting_coop__coverage_requests WHERE date = :today AND status != 'cancelled' ORDER BY created_at LIMIT 20"
+    }
+  },
   "resource_limits": {
     "max_db_bytes": 52428800
   },
