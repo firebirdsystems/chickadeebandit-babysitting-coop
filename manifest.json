@@ -71,6 +71,23 @@
     "babysitting.coverage_posted": { "require_role": "adult" },
     "babysitting.hours_confirmed": { "require_role": "adult" }
   },
+  "member_references": {
+    "coverage_requests": { "column": "requester_id", "on_removed": "keep" },
+    "coverage_claims": { "column": "member_id", "on_removed": "delete" },
+    "ledger_entries": [
+      { "column": "sitter_id", "on_removed": "keep" },
+      { "column": "parent_id", "on_removed": "keep" }
+    ],
+    "ledger_agreements": [
+      { "column": "sitter_id", "on_removed": "keep" },
+      { "column": "parent_id", "on_removed": "keep" }
+    ]
+  },
+  "delete_cascades": {
+    "ledger_entries": [
+      { "table": "ledger_agreements", "foreign_key": "id" }
+    ]
+  },
   "nav": { "label": "Babysitting" },
   "resource_limits": {
     "max_db_bytes": 52428800
