@@ -89,6 +89,18 @@
     ]
   },
   "nav": { "label": "Babysitting" },
+  "glance": {
+    "source": {
+      "kind": "sql",
+      "query": "SELECT COUNT(*) AS n FROM app_babysitting_coop__coverage_requests WHERE status = 'open' AND date >= :today LIMIT 1"
+    },
+    "display": {
+      "template": "badge",
+      "count": "n",
+      "label": "coverage requests open",
+      "severity": "warn"
+    }
+  },
   "agenda": {
     "kind": "event",
     "label": "Coverage",
