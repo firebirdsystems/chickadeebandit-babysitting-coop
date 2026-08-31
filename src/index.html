@@ -131,7 +131,7 @@
 </div>
 
 <script type="module">
-import { esc, isAdult as sdkIsAdult, memberColor, initial, hubConfirm, searchMatch } from "/hub-sdk.js";
+import { esc, isAdult as sdkIsAdult, memberColor, initial, hubConfirm, searchMatch, hubToday as today } from "/hub-sdk.js";
 import { sendHubNotification, hubAppUrl } from "/hub-sdk.js";
 import {
   toMinutes, minutesToLabel, entryStatus, isConfirmed, needsMyConfirmation,
@@ -168,7 +168,6 @@ let notice = "";
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 function nowIso() { return new Date().toISOString(); }
-function today() { return new Date().toISOString().slice(0, 10); }
 function fmtDate(value) {
   if (!value) return "";
   return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" })
@@ -595,7 +594,7 @@ function renderTabs() {
   return `
     <div class="tabs">
       <button class="tab ${view === "ledger" ? "active" : ""}" data-tab="ledger">Ledger</button>
-      <button class="tab ${view === "coverage" ? "active" : ""}" data-tab="coverage">Coverage</button>
+      <button class="tab ${view === "coverage" ? "active" : ""}" data-testid="app-tab" data-tab="coverage">Coverage</button>
     </div>`;
 }
 
@@ -708,15 +707,15 @@ function renderRequestCard(request) {
 
   const alreadyLogged = entries.some(e => e.request_id === request.id && e.sitter_id === me?.id);
   const actions = [];
-  if (!isPoster && open && canClaim(request, claims, me?.id)) actions.push(`<button class="btn btn-sm" data-claim="${esc(request.id)}">Offer to cover</button>`);
+  if (!isPoster && open && canClaim(request, claims, me?.id)) actions.push(`<button class="btn btn-sm" data-testid="claim-btn" data-request-id="${esc(request.id)}" data-claim="${esc(request.id)}">Offer to cover</button>`);
   if (!isPoster && mineClaim && !alreadyLogged) actions.push(`<button class="btn btn-sm" data-log-coverage="${esc(request.id)}">Log these hours</button>`);
   if (!isPoster && mineClaim) actions.push(`<button class="btn btn-danger btn-sm" data-release="${esc(request.id)}">Withdraw offer</button>`);
   if (isPoster && open) actions.push(`<button class="btn btn-ghost btn-sm" data-close-req="${esc(request.id)}">Close</button>`);
   if (isPoster && !open) actions.push(`<button class="btn btn-ghost btn-sm" data-reopen="${esc(request.id)}">Reopen</button>`);
-  if (isPoster) actions.push(`<button class="btn btn-quiet-danger" data-del-request="${esc(request.id)}">Delete</button>`);
+  if (isPoster) actions.push(`<button class="btn btn-quiet-danger" data-testid="delete-request" data-request-id="${esc(request.id)}" data-del-request="${esc(request.id)}">Delete</button>`);
 
   return `
-    <article class="card">
+    <article class="card" data-testid="request-card" data-request-id="${esc(request.id)}">
       <div class="row-card">
         <div>
           <div class="item-title">${esc(request.title)}</div>

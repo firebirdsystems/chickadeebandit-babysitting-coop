@@ -1,0 +1,82 @@
+{
+  "scenarios": [
+    {
+      "name": "the poster of a coverage request is not offered the chance to cover it themselves",
+      "members": {
+        "poster": "adult",
+        "sitter": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, est_minutes, capacity, status, created_at) VALUES ('bc-req', ?, ?, ?, '2026-09-12', 120, 1, 'open', '2026-08-01T09:00:00Z')",
+          "params": [
+            "{{poster}}",
+            "Pat Poster",
+            "Friday evening sitter needed"
+          ]
+        },
+        {
+          "action": "open",
+          "as": "poster"
+        },
+        {
+          "action": "expectVisible",
+          "as": "poster",
+          "selector": "[data-testid=\"app-tab\"][data-tab=\"coverage\"]"
+        },
+        {
+          "action": "click",
+          "as": "poster",
+          "selector": "[data-testid=\"app-tab\"][data-tab=\"coverage\"]"
+        },
+        {
+          "action": "expectVisible",
+          "as": "poster",
+          "selector": "[data-testid=\"request-card\"][data-request-id=\"bc-req\"]"
+        },
+        {
+          "action": "expectCount",
+          "as": "poster",
+          "selector": "[data-testid=\"claim-btn\"][data-request-id=\"bc-req\"]",
+          "count": 0
+        },
+        {
+          "action": "expectVisible",
+          "as": "poster",
+          "selector": "[data-testid=\"delete-request\"][data-request-id=\"bc-req\"]"
+        },
+        {
+          "action": "open",
+          "as": "sitter"
+        },
+        {
+          "action": "expectVisible",
+          "as": "sitter",
+          "selector": "[data-testid=\"app-tab\"][data-tab=\"coverage\"]"
+        },
+        {
+          "action": "click",
+          "as": "sitter",
+          "selector": "[data-testid=\"app-tab\"][data-tab=\"coverage\"]"
+        },
+        {
+          "action": "expectVisible",
+          "as": "sitter",
+          "selector": "[data-testid=\"request-card\"][data-request-id=\"bc-req\"]"
+        },
+        {
+          "action": "expectCount",
+          "as": "sitter",
+          "selector": "[data-testid=\"delete-request\"][data-request-id=\"bc-req\"]",
+          "count": 0
+        },
+        {
+          "action": "expectVisible",
+          "as": "sitter",
+          "selector": "[data-testid=\"claim-btn\"][data-request-id=\"bc-req\"]"
+        }
+      ]
+    }
+  ]
+}
