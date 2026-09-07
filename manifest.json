@@ -66,6 +66,10 @@
       "snapshot_columns": ["minutes"]
     }
   },
+  "exports": ["calendar_events"],
+  "store_acls": {
+    "calendar_events": { "write": { "require_role": "adult" } }
+  },
   "publishes": ["babysitting.coverage_posted", "babysitting.hours_confirmed"],
   "publish_acls": {
     "babysitting.coverage_posted": { "require_role": "adult" },

@@ -158,3 +158,81 @@ export function claimErrorMessage(json) {
 export function searchableFields(item) {
   return [item.title, item.notes, item.kids, item.requester_name];
 }
+
+// ── Calendar export ───────────────────────────────────────────────────────────
+
+export const CALENDAR_EXPORT_HORIZON_DAYS = 180;
+export const CALENDAR_EXPORT_MAX_EVENTS = 100;
+
+function atMidnight(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
+}
+
+/** Local `yyyy-mm-dd` for a Date — used only to place the horizon cutoff. */
+export function isoDay(d) {
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+/**
+ * Build the `calendar_events` payload from upcoming coverage requests.
+ *
+ * Shape matches what the hub's cross-app aggregation consumes — see
+ * `normalizeExportedEvent` in packages/hub/src/cloudflare/calendar-feed.ts.
+ * A request with no `start_time` becomes an all-day entry: the hub derives
+ * `allDay` from the absence of a `T` in `start`, so a date-only request
+ * degrades on its own rather than being dropped.
+ *
+ * ONLY coverage_requests are exported. This blob is scope-wide — every member
+ * of the household, and every household in a shared space, reads all of it, and
+ * row policies do not filter it. coverage_requests is `adult_writable`, so
+ * everyone in the scope can already see these rows. ledger_entries is
+ * `party_scoped` (visible only to the two members named on the row) and
+ * ledger_agreements is `endpoint_only` with `read: "adult"` — neither is
+ * scope-wide, so putting either in this payload would hand every reader a
+ * private exchange between two households. coverage_claims would be
+ * permissible (`read: "everyone"`), but the request row is the dated thing and
+ * naming the sitter adds no date, so it is left out.
+ *
+ * `notes` and `kids` are deliberately NOT exported. This payload reaches the
+ * household's ICS feed, which external calendar services fetch: `notes` is free
+ * text a parent wrote for the co-op, and `kids` is the children's names. The
+ * title and the hours are what a calendar entry is FOR; there is no location
+ * column on a request, so location is always "".
+ */
+export function buildCalendarEvents(requests, todayIso, from = new Date()) {
+  const horizon = isoDay(new Date(atMidnight(from).getTime() + CALENDAR_EXPORT_HORIZON_DAYS * 86400000));
+  return (requests || [])
+    .filter((r) => r.status !== "cancelled")
+    .filter((r) => r.date >= todayIso && r.date <= horizon)
+    .map((r) => {
+      const start = r.start_time ? `${r.date}T${r.start_time}` : r.date;
+      const end = r.start_time && r.end_time ? `${r.date}T${r.end_time}` : start;
+      return {
+        id: r.id,
+        title: r.title,
+        description: statusLabel(r.status),
+        location: "",
+        start,
+        end,
+        all_day: !r.start_time,
+        member_ids: r.requester_id ? [r.requester_id] : [],
+        source_label: "Babysitting",
+      };
+    })
+    .sort((a, b) => String(a.start).localeCompare(String(b.start)))
+    .slice(0, CALENDAR_EXPORT_MAX_EVENTS);
+}
+
+/**
+ * A one-word state, not free text a member typed.
+ * The exported label deliberately differs from the internal status value:
+ * `closed` here means a sitter took the request, but "Closed" on a calendar
+ * entry reads as "cancelled" — the opposite — so it goes out as "Covered".
+ */
+function statusLabel(status) {
+  const s = String(status || "");
+  if (s === "closed") return "Covered";
+  if (!s) return "Coverage";
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}

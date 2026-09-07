@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   toMinutes, minutesToLabel, entryStatus, isConfirmed, needsMyConfirmation,
   computeBalances, claimCount, isFull, canClaim, claimErrorMessage, canLogHours, searchableFields,
+  buildCalendarEvents, CALENDAR_EXPORT_HORIZON_DAYS, CALENDAR_EXPORT_MAX_EVENTS,
 } from "../src/logic.js";
 
 describe("time helpers", () => {
@@ -129,5 +130,100 @@ describe("searchableFields", () => {
     const fields = searchableFields({ title: "Friday evening", notes: "bedtime done", kids: "Mia and Sam", requester_name: "Ada" });
     expect(fields).toContain("Mia and Sam");
     expect(fields).toContain("bedtime done");
+  });
+});
+
+describe("buildCalendarEvents", () => {
+  const from = new Date(2026, 0, 15);       // 2026-01-15, local
+  const todayIso = "2026-01-15";
+  const base = {
+    id: "r1", requester_id: "A", requester_name: "Ada", title: "Friday evening",
+    date: "2026-01-20", start_time: "18:00", end_time: "21:30", kids: "Mia and Sam",
+    est_minutes: 210, capacity: 1, status: "open", notes: "bedtime is 8",
+  };
+
+  it("builds a timed entry for an upcoming request", () => {
+    const [e] = buildCalendarEvents([base], todayIso, from);
+    expect(e).toEqual({
+      id: "r1",
+      title: "Friday evening",
+      description: "Open",
+      location: "",
+      start: "2026-01-20T18:00",
+      end: "2026-01-20T21:30",
+      all_day: false,
+      member_ids: ["A"],
+      source_label: "Babysitting",
+    });
+  });
+
+  it("a closed request is labelled Covered, not Closed", () => {
+    // A closed request means a sitter took it, so the sitting still happens and
+    // the entry stays on the calendar. "Closed" would read as cancelled.
+    const [e] = buildCalendarEvents([{ ...base, status: "closed" }], todayIso, from);
+    expect(e.description).toBe("Covered");
+    const [unknown] = buildCalendarEvents([{ ...base, status: "" }], todayIso, from);
+    expect(unknown.description).toBe("Coverage");
+  });
+
+  it("a request with no start time is an all-day entry ending where it starts", () => {
+    const [e] = buildCalendarEvents([{ ...base, start_time: "", end_time: "" }], todayIso, from);
+    expect(e.start).toBe("2026-01-20");
+    expect(e.end).toBe("2026-01-20");
+    expect(e.all_day).toBe(true);
+  });
+
+  it("falls back to the start when only the end time is missing", () => {
+    const [e] = buildCalendarEvents([{ ...base, end_time: "" }], todayIso, from);
+    expect(e.end).toBe("2026-01-20T18:00");
+  });
+
+  it("leaves member_ids empty when the requester is unknown", () => {
+    const [e] = buildCalendarEvents([{ ...base, requester_id: "" }], todayIso, from);
+    expect(e.member_ids).toEqual([]);
+  });
+
+  it("excludes past requests and requests beyond the horizon", () => {
+    const past = { ...base, id: "past", date: "2026-01-14" };
+    const beyond = { ...base, id: "beyond", date: "2026-12-31" };
+    const ids = buildCalendarEvents([past, base, beyond], todayIso, from).map(e => e.id);
+    expect(ids).toEqual(["r1"]);
+  });
+
+  it("excludes cancelled requests", () => {
+    const events = buildCalendarEvents([{ ...base, status: "cancelled" }], todayIso, from);
+    expect(events).toEqual([]);
+  });
+
+  it("never exports the notes or the kids' names", () => {
+    // This payload is scope-wide and reaches the household ICS feed, which
+    // external calendar services fetch. `notes` is free text a parent wrote for
+    // the co-op and `kids` is the children's names — neither belongs on a feed
+    // that leaves the household. Assert on the serialized blob, because that is
+    // exactly what gets POSTed to the store.
+    const json = JSON.stringify(buildCalendarEvents([base], todayIso, from));
+    expect(json).not.toContain("bedtime is 8");
+    expect(json).not.toContain("Mia and Sam");
+    expect(json).not.toContain("notes");
+    expect(json).not.toContain("kids");
+  });
+
+  it("caps at CALENDAR_EXPORT_MAX_EVENTS, keeping the nearest requests", () => {
+    const rows = [];
+    for (let i = 0; i < CALENDAR_EXPORT_MAX_EVENTS + 20; i++) {
+      const day = String(16 + (i % 14)).padStart(2, "0");
+      rows.push({ ...base, id: `r${i}`, date: `2026-01-${day}` });
+    }
+    const events = buildCalendarEvents(rows, todayIso, from);
+    expect(events.length).toBe(CALENDAR_EXPORT_MAX_EVENTS);
+    // Sorted ascending, so the cap sheds the FURTHEST out, never the soonest.
+    expect(events[0].start.startsWith("2026-01-16")).toBe(true);
+    const kept = events.map(e => e.start);
+    expect([...kept].sort()).toEqual(kept);
+    expect(kept[kept.length - 1] < "2026-01-29").toBe(true);
+  });
+
+  it("horizon is half a year — a co-op is arranged a season ahead at most", () => {
+    expect(CALENDAR_EXPORT_HORIZON_DAYS).toBe(180);
   });
 });

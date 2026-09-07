@@ -145,3 +145,30 @@ if (manifest.ai_access) {
     });
   }
 }
+
+// ── calendar_events export ────────────────────────────────────────────────────
+describe("calendar export", () => {
+  it("publishes coverage requests to the household calendar", () => {
+    // The hub only aggregates an app's calendar_events export when the manifest
+    // lists it (collectCrossAppEvents filters on manifest.exports), so dropping
+    // this key silently empties the coverage board off the calendar.
+    expect(manifest.exports).toContain("calendar_events");
+  });
+
+  it("gates the calendar export behind an adult", () => {
+    // Without this ACL any member could POST straight to the store key and
+    // rewrite what the household calendar and the ICS feed show. Coverage
+    // requests are adult_writable, so the app's own sync path is already
+    // adult-only — this closes the direct-POST path behind it.
+    expect(manifest.store_acls?.calendar_events?.write?.require_role).toBe("adult");
+  });
+
+  it("only exports a table every member of the scope already reads", () => {
+    // The store blob is scope-wide and row policies do not filter it. Coverage
+    // requests are adult_writable (everyone reads); the ledger tables are
+    // party_scoped / endpoint_only and must never reach it.
+    expect(manifest.row_policies?.coverage_requests?.kind).toBe("adult_writable");
+    expect(manifest.row_policies?.ledger_entries?.kind).toBe("party_scoped");
+    expect(manifest.row_policies?.ledger_agreements?.kind).toBe("endpoint_only");
+  });
+});

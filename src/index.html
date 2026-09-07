@@ -134,8 +134,9 @@
 import { esc, isAdult as sdkIsAdult, memberColor, initial, hubConfirm, searchMatch, hubToday as today } from "/hub-sdk.js";
 import { sendHubNotification, hubAppUrl } from "/hub-sdk.js";
 import {
-  toMinutes, minutesToLabel, entryStatus, isConfirmed, needsMyConfirmation,
+  toMinutes, minutesToLabel, isConfirmed, needsMyConfirmation,
   computeBalances, confirmedMinutes, claimCount, isFull, canClaim, claimErrorMessage, searchableFields,
+  buildCalendarEvents,
 } from "./logic.js";
 
 const CONTEXT = window.__CONTEXT_URL ?? "";
@@ -144,6 +145,7 @@ const CLAIM_URL = window.__CLAIM_URL ?? "";
 const RELEASE_URL = window.__RELEASE_URL ?? "";
 const APP_ID = window.__APP_ID ?? "babysitting-coop";
 const EVENTS_URL = window.__EVENTS_URL ?? "/api/events";
+const STORE_URL = window.__STORE_URL ?? "";
 const HUB_MEMBER = window.__CURRENT_MEMBER ?? null;
 
 const T = {
@@ -317,6 +319,7 @@ async function submitLogHours() {
       try {
         if (DB) await db(`UPDATE ${T.requests} SET status = 'closed' WHERE id = ?`, [requestId]);
         linked.status = "closed";
+        syncCalendar();
       } catch { /* leave the request open; the poster can close it manually */ }
     }
 
@@ -378,6 +381,24 @@ async function deleteEntry(id) {
   } catch (e) { showError(e.message); }
 }
 
+/**
+ * Republish the `calendar_events` export so open coverage shows up on the
+ * household calendar and in the ICS feed. Best-effort and never awaited into a
+ * caller's error path: a failed sync must not roll back a request the user just
+ * posted, and the next mutation republishes the whole payload anyway.
+ * Only coverage_requests go in — see buildCalendarEvents for why the ledger
+ * tables never can.
+ */
+async function syncCalendar() {
+  if (!STORE_URL || !DB) return;
+  const events = buildCalendarEvents(requests, today());
+  await fetch(STORE_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key: "calendar_events", value: JSON.stringify(events) }),
+  }).catch(() => {});
+}
+
 // ── Coverage actions ──────────────────────────────────────────────────────────
 async function submitRequest() {
   const title = document.getElementById("f-title")?.value.trim();
@@ -407,6 +428,7 @@ async function submitRequest() {
       );
     }
     requests = [...requests, request].sort((a, b) => a.date.localeCompare(b.date));
+    syncCalendar();
     closeModal();
     showNotice("Coverage request posted.");
 
@@ -475,6 +497,7 @@ async function closeRequest(requestId) {
   try {
     if (DB) await db(`UPDATE ${T.requests} SET status = 'closed' WHERE id = ?`, [requestId]);
     request.status = "closed";
+    syncCalendar();
     showNotice("Request closed.");
   } catch (e) { showError(e.message); }
 }
@@ -485,6 +508,7 @@ async function reopenRequest(requestId) {
   try {
     if (DB) await db(`UPDATE ${T.requests} SET status = 'open' WHERE id = ?`, [requestId]);
     request.status = "open";
+    syncCalendar();
     showNotice("Request reopened.");
   } catch (e) { showError(e.message); }
 }
@@ -498,6 +522,7 @@ async function deleteRequest(requestId) {
     if (DB) await db(`DELETE FROM ${T.requests} WHERE id = ?`, [requestId]);
     requests = requests.filter(r => r.id !== requestId);
     claims = claims.filter(c => c.request_id !== requestId);
+    syncCalendar();
     showNotice("Request deleted.");
   } catch (e) { showError(e.message); }
 }
