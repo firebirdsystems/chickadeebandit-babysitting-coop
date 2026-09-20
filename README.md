@@ -1,5 +1,7 @@
 # Babysitting Co-op Ledger
 
+A [Chickadee Bandit](https://chickadeebandit.com/app-library/babysitting-coop) app.
+
 A points ledger for a babysitting-exchange co-op. Adults log the hours they sat
 for another household, the other parent confirms, and the app tracks who owes
 whom. Members can also post coverage requests that other co-op members claim.
