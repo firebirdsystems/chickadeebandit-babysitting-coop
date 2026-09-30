@@ -70,6 +70,120 @@
           "expect": { "status": 403, "errorIncludes": "endpoint" }
         }
       ]
+    },
+    {
+      "name": "a sitter's claim on a coverage request cannot be cancelled, reassigned or crowded out by another adult through app SQL",
+      "members": { "requester": "adult", "sitter": "adult", "rival": "adult" },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, capacity, status, created_at) VALUES ('r1', ?, 'Requester', 'Friday date night', '2026-10-02', 1, 'open', '2026-09-30T10:00:00Z')",
+          "params": ["{{requester}}"]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, note, claimed_at) VALUES ('c1', 'r1', ?, 'I can do it', '2026-09-30T11:00:00Z')",
+          "params": ["{{sitter}}"]
+        },
+        {
+          "action": "db",
+          "as": "rival",
+          "sql": "DELETE FROM app_babysitting_coop__coverage_claims WHERE id = 'c1'",
+          "expect": { "status": 403, "errorIncludes": "endpoint" }
+        },
+        {
+          "action": "db",
+          "as": "rival",
+          "sql": "UPDATE app_babysitting_coop__coverage_claims SET member_id = ? WHERE id = 'c1'",
+          "params": ["{{rival}}"],
+          "expect": { "status": 403, "errorIncludes": "endpoint" }
+        },
+        {
+          "action": "db",
+          "as": "rival",
+          "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, note, claimed_at) VALUES ('c2', 'r1', ?, 'me instead', '2026-09-30T12:00:00Z')",
+          "params": ["{{rival}}"],
+          "expect": { "status": 403, "errorIncludes": "endpoint" }
+        },
+        {
+          "action": "db",
+          "as": "requester",
+          "sql": "DELETE FROM app_babysitting_coop__coverage_claims WHERE id = 'c1'",
+          "expect": { "status": 403, "errorIncludes": "endpoint" }
+        },
+        {
+          "action": "db",
+          "as": "requester",
+          "sql": "SELECT id, member_id FROM app_babysitting_coop__coverage_claims WHERE request_id = 'r1'",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "c1", "member_id": "scn-sitter" }] }
+        }
+      ]
+    },
+    {
+      "name": "the co-op is adults-only: an ungranted child is refused outright, and a granted child can read the coverage board but cannot post or cancel a request",
+      "members": { "parent": "adult", "kid": "child", "teen": "child" },
+      "granted": ["teen"],
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, capacity, status, created_at) VALUES ('r1', ?, 'Parent', 'Saturday errands', '2026-10-03', 1, 'open', '2026-09-30T10:00:00Z')",
+          "params": ["{{parent}}"]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, note, claimed_at) VALUES ('c1', 'r1', ?, '', '2026-09-30T11:00:00Z')",
+          "params": ["{{parent}}"]
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "SELECT id FROM app_babysitting_coop__coverage_requests",
+          "expect": { "status": 403, "errorIncludes": "not available" }
+        },
+        {
+          "action": "db",
+          "as": "teen",
+          "sql": "SELECT id, status FROM app_babysitting_coop__coverage_requests",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "r1", "status": "open" }] }
+        },
+        {
+          "action": "db",
+          "as": "teen",
+          "sql": "SELECT id FROM app_babysitting_coop__coverage_claims",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "c1" }] }
+        },
+        {
+          "action": "db",
+          "as": "teen",
+          "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, capacity, status, created_at) VALUES ('r-teen', ?, 'Teen', 'Party night', '2026-10-04', 1, 'open', '2026-09-30T12:00:00Z')",
+          "params": ["{{teen}}"],
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "teen",
+          "sql": "UPDATE app_babysitting_coop__coverage_requests SET status = 'cancelled' WHERE id = 'r1'",
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "teen",
+          "sql": "DELETE FROM app_babysitting_coop__coverage_claims WHERE id = 'c1'",
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "SELECT id, status FROM app_babysitting_coop__coverage_requests",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "r1", "status": "open" }] }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "SELECT id FROM app_babysitting_coop__coverage_claims",
+          "expect": { "status": 200, "rowCount": 1 }
+        }
+      ]
     }
   ]
 }
