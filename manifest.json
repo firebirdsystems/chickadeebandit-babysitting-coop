@@ -121,5 +121,19 @@
     "allowed": true,
     "mode": "read",
     "db_exports": ["open_coverage", "recent_claims"]
+  },
+  "preload": {
+    "coverage_requests": {
+      "sql": "SELECT * FROM app_babysitting_coop__coverage_requests ORDER BY date ASC, created_at ASC"
+    },
+    "coverage_claims": {
+      "sql": "SELECT * FROM app_babysitting_coop__coverage_claims ORDER BY claimed_at ASC"
+    },
+    "ledger_entries": {
+      "sql": "SELECT * FROM app_babysitting_coop__ledger_entries ORDER BY created_at DESC"
+    },
+    "ledger_agreements": {
+      "sql": "SELECT * FROM app_babysitting_coop__ledger_agreements"
+    }
   }
 }

@@ -230,10 +230,13 @@ async function loadMembers() {
 async function loadData() {
   if (!DB) { seedDemo(); return; }
   const [reqRows, claimRows, entryRows, agreeRows] = await Promise.all([
-    db(`SELECT * FROM ${T.requests} ORDER BY date ASC, created_at ASC`),
-    db(`SELECT * FROM ${T.claims} ORDER BY claimed_at ASC`),
-    db(`SELECT * FROM ${T.entries} ORDER BY created_at DESC`),
-    db(`SELECT * FROM ${T.agreements}`),
+    // Written out in full, not built from T: manifest.preload declares these
+    // four, and the hub answers one from the document only when this text is
+    // exactly the manifest's.
+    db("SELECT * FROM app_babysitting_coop__coverage_requests ORDER BY date ASC, created_at ASC"),
+    db("SELECT * FROM app_babysitting_coop__coverage_claims ORDER BY claimed_at ASC"),
+    db("SELECT * FROM app_babysitting_coop__ledger_entries ORDER BY created_at DESC"),
+    db("SELECT * FROM app_babysitting_coop__ledger_agreements"),
   ]);
   requests = reqRows.rows;
   claims = claimRows.rows;

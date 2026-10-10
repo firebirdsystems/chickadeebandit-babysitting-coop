@@ -1,0 +1,2079 @@
+{
+  "seed": [
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-108 days','+0 minutes'))",
+      "params": [
+        "perf-cov-01",
+        "{{me}}",
+        "Perf Admin",
+        "Friday evening sitter needed",
+        "{{date:-100}}",
+        "18:00",
+        "22:00",
+        "2 kids (4 & 6)",
+        240,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-105 days','+19 minutes'))",
+      "params": [
+        "perf-cov-02",
+        "{{partner}}",
+        "Perf Partner",
+        "Saturday date night",
+        "{{date:-97}}",
+        "17:30",
+        "21:00",
+        "1 kid (7)",
+        210,
+        1,
+        "closed",
+        "Dinner is in the fridge."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-103 days','+19 minutes'))",
+      "params": [
+        "perf-claim-01",
+        "perf-cov-02",
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-96 days','+5 minutes'))",
+      "params": [
+        "perf-led-01",
+        "{{me}}",
+        "Perf Admin",
+        "{{partner}}",
+        "Perf Partner",
+        210,
+        "{{date:-97}}",
+        "perf-cov-02"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-95 days','+5 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-95 days','+5 minutes'), ?)",
+      "params": [
+        "perf-led-01",
+        "{{me}}",
+        "{{partner}}",
+        1,
+        1,
+        "locked",
+        210
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-102 days','+38 minutes'))",
+      "params": [
+        "perf-cov-03",
+        "{{adult2}}",
+        "Perf Adult",
+        "School pickup and homework",
+        "{{date:-94}}",
+        "15:00",
+        "17:30",
+        "3 kids (2, 5 & 9)",
+        150,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-100 days','+38 minutes'))",
+      "params": [
+        "perf-claim-02",
+        "perf-cov-03",
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-93 days','+10 minutes'))",
+      "params": [
+        "perf-led-02",
+        "{{me}}",
+        "Perf Admin",
+        "{{adult2}}",
+        "Perf Adult",
+        165,
+        "{{date:-94}}",
+        "perf-cov-03"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-92 days','+10 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-92 days','+10 minutes'), ?)",
+      "params": [
+        "perf-led-02",
+        "{{me}}",
+        "{{adult2}}",
+        1,
+        1,
+        "locked",
+        165
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-99 days','+57 minutes'))",
+      "params": [
+        "perf-cov-04",
+        "{{me}}",
+        "Perf Admin",
+        "Early morning before work",
+        "{{date:-91}}",
+        "06:30",
+        "08:30",
+        "2 kids (8 & 10)",
+        120,
+        1,
+        "closed",
+        "Dog needs to go out at 7."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, note, claimed_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-97 days','+57 minutes'))",
+      "params": [
+        "perf-claim-03",
+        "perf-cov-04",
+        "{{adult2}}",
+        "Happy to help, I can bring dinner."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-90 days','+15 minutes'))",
+      "params": [
+        "perf-led-03",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{me}}",
+        "Perf Admin",
+        150,
+        "{{date:-91}}",
+        "perf-cov-04"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-90 days','+15 minutes'))",
+      "params": [
+        "perf-led-03",
+        "{{adult2}}",
+        "{{me}}",
+        1,
+        0,
+        "pending"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-96 days','+76 minutes'))",
+      "params": [
+        "perf-cov-05",
+        "{{partner}}",
+        "Perf Partner",
+        "Sunday afternoon errand run",
+        "{{date:-88}}",
+        "13:00",
+        "16:00",
+        "2 kids (4 & 6)",
+        180,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94 days','+76 minutes'))",
+      "params": [
+        "perf-claim-04",
+        "perf-cov-05",
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-87 days','+20 minutes'))",
+      "params": [
+        "perf-led-04",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{partner}}",
+        "Perf Partner",
+        165,
+        "{{date:-88}}",
+        "Stayed a little late.",
+        "perf-cov-05"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-86 days','+20 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-86 days','+20 minutes'), ?)",
+      "params": [
+        "perf-led-04",
+        "{{adult2}}",
+        "{{partner}}",
+        1,
+        1,
+        "locked",
+        165
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-93 days','+95 minutes'))",
+      "params": [
+        "perf-cov-06",
+        "{{adult2}}",
+        "Perf Adult",
+        "Parent-teacher conference",
+        "{{date:-85}}",
+        "18:00",
+        "22:00",
+        "1 kid (7)",
+        240,
+        1,
+        "closed",
+        "Dinner is in the fridge."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-91 days','+95 minutes'))",
+      "params": [
+        "perf-claim-05",
+        "perf-cov-06",
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','+25 minutes'))",
+      "params": [
+        "perf-led-05",
+        "{{partner}}",
+        "Perf Partner",
+        "{{adult2}}",
+        "Perf Adult",
+        240,
+        "{{date:-85}}",
+        "perf-cov-06"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-83 days','+25 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-83 days','+25 minutes'), ?)",
+      "params": [
+        "perf-led-05",
+        "{{partner}}",
+        "{{adult2}}",
+        1,
+        1,
+        "locked",
+        240
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-90 days','+114 minutes'))",
+      "params": [
+        "perf-cov-07",
+        "{{me}}",
+        "Perf Admin",
+        "Doctor appointment cover",
+        "{{date:-82}}",
+        "17:30",
+        "21:00",
+        "3 kids (2, 5 & 9)",
+        210,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, note, claimed_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-88 days','+114 minutes'))",
+      "params": [
+        "perf-claim-06",
+        "perf-cov-07",
+        "{{partner}}",
+        "Happy to help, I can bring dinner."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-81 days','+30 minutes'))",
+      "params": [
+        "perf-led-06",
+        "{{partner}}",
+        "Perf Partner",
+        "{{me}}",
+        "Perf Admin",
+        225,
+        "{{date:-82}}",
+        "perf-cov-07"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-80 days','+30 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-80 days','+30 minutes'), ?)",
+      "params": [
+        "perf-led-06",
+        "{{partner}}",
+        "{{me}}",
+        1,
+        1,
+        "locked",
+        225
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-87 days','+133 minutes'))",
+      "params": [
+        "perf-cov-08",
+        "{{partner}}",
+        "Perf Partner",
+        "Anniversary dinner",
+        "{{date:-79}}",
+        "15:00",
+        "17:30",
+        "2 kids (8 & 10)",
+        150,
+        1,
+        "closed",
+        "Dog needs to go out at 7."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-85 days','+133 minutes'))",
+      "params": [
+        "perf-claim-07",
+        "perf-cov-08",
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-78 days','+35 minutes'))",
+      "params": [
+        "perf-led-07",
+        "{{me}}",
+        "Perf Admin",
+        "{{partner}}",
+        "Perf Partner",
+        180,
+        "{{date:-79}}",
+        "perf-cov-08"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-77 days','+35 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-77 days','+35 minutes'), ?)",
+      "params": [
+        "perf-led-07",
+        "{{me}}",
+        "{{partner}}",
+        1,
+        1,
+        "locked",
+        180
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','+152 minutes'))",
+      "params": [
+        "perf-cov-09",
+        "{{adult2}}",
+        "Perf Adult",
+        "Friday evening sitter needed",
+        "{{date:-76}}",
+        "06:30",
+        "08:30",
+        "2 kids (4 & 6)",
+        120,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-82 days','+152 minutes'))",
+      "params": [
+        "perf-claim-08",
+        "perf-cov-09",
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-75 days','+40 minutes'))",
+      "params": [
+        "perf-led-08",
+        "{{me}}",
+        "Perf Admin",
+        "{{adult2}}",
+        "Perf Adult",
+        105,
+        "{{date:-76}}",
+        "Stayed a little late.",
+        "perf-cov-09"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-74 days','+40 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-74 days','+40 minutes'), ?)",
+      "params": [
+        "perf-led-08",
+        "{{me}}",
+        "{{adult2}}",
+        1,
+        1,
+        "locked",
+        105
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-81 days','+171 minutes'))",
+      "params": [
+        "perf-cov-10",
+        "{{me}}",
+        "Perf Admin",
+        "Saturday date night",
+        "{{date:-73}}",
+        "13:00",
+        "16:00",
+        "1 kid (7)",
+        180,
+        1,
+        "closed",
+        "Dinner is in the fridge."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-78 days','+190 minutes'))",
+      "params": [
+        "perf-cov-11",
+        "{{partner}}",
+        "Perf Partner",
+        "School pickup and homework",
+        "{{date:-70}}",
+        "18:00",
+        "22:00",
+        "3 kids (2, 5 & 9)",
+        240,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, note, claimed_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-76 days','+190 minutes'))",
+      "params": [
+        "perf-claim-09",
+        "perf-cov-11",
+        "{{adult2}}",
+        "Happy to help, I can bring dinner."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69 days','+50 minutes'))",
+      "params": [
+        "perf-led-09",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{partner}}",
+        "Perf Partner",
+        255,
+        "{{date:-70}}",
+        "perf-cov-11"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-68 days','+50 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-68 days','+50 minutes'), ?)",
+      "params": [
+        "perf-led-09",
+        "{{adult2}}",
+        "{{partner}}",
+        1,
+        1,
+        "locked",
+        255
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-75 days','+209 minutes'))",
+      "params": [
+        "perf-cov-12",
+        "{{adult2}}",
+        "Perf Adult",
+        "Early morning before work",
+        "{{date:-67}}",
+        "17:30",
+        "21:00",
+        "2 kids (8 & 10)",
+        210,
+        1,
+        "closed",
+        "Dog needs to go out at 7."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-73 days','+209 minutes'))",
+      "params": [
+        "perf-claim-10",
+        "perf-cov-12",
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-66 days','+55 minutes'))",
+      "params": [
+        "perf-led-10",
+        "{{partner}}",
+        "Perf Partner",
+        "{{adult2}}",
+        "Perf Adult",
+        240,
+        "{{date:-67}}",
+        "perf-cov-12"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-66 days','+55 minutes'))",
+      "params": [
+        "perf-led-10",
+        "{{partner}}",
+        "{{adult2}}",
+        1,
+        0,
+        "pending"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-72 days','+228 minutes'))",
+      "params": [
+        "perf-cov-13",
+        "{{me}}",
+        "Perf Admin",
+        "Sunday afternoon errand run",
+        "{{date:-64}}",
+        "15:00",
+        "17:30",
+        "2 kids (4 & 6)",
+        150,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-70 days','+228 minutes'))",
+      "params": [
+        "perf-claim-11",
+        "perf-cov-13",
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-63 days','+60 minutes'))",
+      "params": [
+        "perf-led-11",
+        "{{partner}}",
+        "Perf Partner",
+        "{{me}}",
+        "Perf Admin",
+        135,
+        "{{date:-64}}",
+        "Stayed a little late.",
+        "perf-cov-13"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-62 days','+60 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-62 days','+60 minutes'), ?)",
+      "params": [
+        "perf-led-11",
+        "{{partner}}",
+        "{{me}}",
+        1,
+        1,
+        "locked",
+        135
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69 days','+247 minutes'))",
+      "params": [
+        "perf-cov-14",
+        "{{partner}}",
+        "Perf Partner",
+        "Parent-teacher conference",
+        "{{date:-61}}",
+        "06:30",
+        "08:30",
+        "1 kid (7)",
+        120,
+        1,
+        "closed",
+        "Dinner is in the fridge."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, note, claimed_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-67 days','+247 minutes'))",
+      "params": [
+        "perf-claim-12",
+        "perf-cov-14",
+        "{{me}}",
+        "Happy to help, I can bring dinner."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','+65 minutes'))",
+      "params": [
+        "perf-led-12",
+        "{{me}}",
+        "Perf Admin",
+        "{{partner}}",
+        "Perf Partner",
+        120,
+        "{{date:-61}}",
+        "perf-cov-14"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-59 days','+65 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-59 days','+65 minutes'), ?)",
+      "params": [
+        "perf-led-12",
+        "{{me}}",
+        "{{partner}}",
+        1,
+        1,
+        "locked",
+        120
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-66 days','+266 minutes'))",
+      "params": [
+        "perf-cov-15",
+        "{{adult2}}",
+        "Perf Adult",
+        "Doctor appointment cover",
+        "{{date:-58}}",
+        "13:00",
+        "16:00",
+        "3 kids (2, 5 & 9)",
+        180,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-64 days','+266 minutes'))",
+      "params": [
+        "perf-claim-13",
+        "perf-cov-15",
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-57 days','+70 minutes'))",
+      "params": [
+        "perf-led-13",
+        "{{me}}",
+        "Perf Admin",
+        "{{adult2}}",
+        "Perf Adult",
+        195,
+        "{{date:-58}}",
+        "perf-cov-15"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-56 days','+70 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-56 days','+70 minutes'), ?)",
+      "params": [
+        "perf-led-13",
+        "{{me}}",
+        "{{adult2}}",
+        1,
+        1,
+        "locked",
+        195
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-63 days','+285 minutes'))",
+      "params": [
+        "perf-cov-16",
+        "{{me}}",
+        "Perf Admin",
+        "Anniversary dinner",
+        "{{date:-55}}",
+        "18:00",
+        "22:00",
+        "2 kids (8 & 10)",
+        240,
+        1,
+        "closed",
+        "Dog needs to go out at 7."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-61 days','+285 minutes'))",
+      "params": [
+        "perf-claim-14",
+        "perf-cov-16",
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-54 days','+75 minutes'))",
+      "params": [
+        "perf-led-14",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{me}}",
+        "Perf Admin",
+        270,
+        "{{date:-55}}",
+        "perf-cov-16"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-53 days','+75 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-53 days','+75 minutes'), ?)",
+      "params": [
+        "perf-led-14",
+        "{{adult2}}",
+        "{{me}}",
+        1,
+        1,
+        "locked",
+        270
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','+304 minutes'))",
+      "params": [
+        "perf-cov-17",
+        "{{partner}}",
+        "Perf Partner",
+        "Friday evening sitter needed",
+        "{{date:-52}}",
+        "17:30",
+        "21:00",
+        "2 kids (4 & 6)",
+        210,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, note, claimed_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-58 days','+304 minutes'))",
+      "params": [
+        "perf-claim-15",
+        "perf-cov-17",
+        "{{adult2}}",
+        "Happy to help, I can bring dinner."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-51 days','+80 minutes'))",
+      "params": [
+        "perf-led-15",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{partner}}",
+        "Perf Partner",
+        195,
+        "{{date:-52}}",
+        "Stayed a little late.",
+        "perf-cov-17"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-50 days','+80 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-50 days','+80 minutes'), ?)",
+      "params": [
+        "perf-led-15",
+        "{{adult2}}",
+        "{{partner}}",
+        1,
+        1,
+        "locked",
+        195
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-57 days','+323 minutes'))",
+      "params": [
+        "perf-cov-18",
+        "{{adult2}}",
+        "Perf Adult",
+        "Saturday date night",
+        "{{date:-49}}",
+        "15:00",
+        "17:30",
+        "1 kid (7)",
+        150,
+        1,
+        "closed",
+        "Dinner is in the fridge."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-55 days','+323 minutes'))",
+      "params": [
+        "perf-claim-16",
+        "perf-cov-18",
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+85 minutes'))",
+      "params": [
+        "perf-led-16",
+        "{{partner}}",
+        "Perf Partner",
+        "{{adult2}}",
+        "Perf Adult",
+        150,
+        "{{date:-49}}",
+        "perf-cov-18"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+85 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-47 days','+85 minutes'), ?)",
+      "params": [
+        "perf-led-16",
+        "{{partner}}",
+        "{{adult2}}",
+        1,
+        1,
+        "locked",
+        150
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-54 days','+342 minutes'))",
+      "params": [
+        "perf-cov-19",
+        "{{me}}",
+        "Perf Admin",
+        "School pickup and homework",
+        "{{date:-46}}",
+        "06:30",
+        "08:30",
+        "3 kids (2, 5 & 9)",
+        120,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-51 days','+361 minutes'))",
+      "params": [
+        "perf-cov-20",
+        "{{partner}}",
+        "Perf Partner",
+        "Early morning before work",
+        "{{date:-43}}",
+        "13:00",
+        "16:00",
+        "2 kids (8 & 10)",
+        180,
+        1,
+        "closed",
+        "Dog needs to go out at 7."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-49 days','+361 minutes'))",
+      "params": [
+        "perf-claim-17",
+        "perf-cov-20",
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-42 days','+95 minutes'))",
+      "params": [
+        "perf-led-17",
+        "{{me}}",
+        "Perf Admin",
+        "{{partner}}",
+        "Perf Partner",
+        210,
+        "{{date:-43}}",
+        "perf-cov-20"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-42 days','+95 minutes'))",
+      "params": [
+        "perf-led-17",
+        "{{me}}",
+        "{{partner}}",
+        1,
+        0,
+        "pending"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+380 minutes'))",
+      "params": [
+        "perf-cov-21",
+        "{{adult2}}",
+        "Perf Adult",
+        "Sunday afternoon errand run",
+        "{{date:-40}}",
+        "18:00",
+        "22:00",
+        "2 kids (4 & 6)",
+        240,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, note, claimed_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-46 days','+380 minutes'))",
+      "params": [
+        "perf-claim-18",
+        "perf-cov-21",
+        "{{me}}",
+        "Happy to help, I can bring dinner."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-39 days','+100 minutes'))",
+      "params": [
+        "perf-led-18",
+        "{{me}}",
+        "Perf Admin",
+        "{{adult2}}",
+        "Perf Adult",
+        225,
+        "{{date:-40}}",
+        "Stayed a little late.",
+        "perf-cov-21"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-38 days','+100 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-38 days','+100 minutes'), ?)",
+      "params": [
+        "perf-led-18",
+        "{{me}}",
+        "{{adult2}}",
+        1,
+        1,
+        "locked",
+        225
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+399 minutes'))",
+      "params": [
+        "perf-cov-22",
+        "{{me}}",
+        "Perf Admin",
+        "Parent-teacher conference",
+        "{{date:-37}}",
+        "17:30",
+        "21:00",
+        "1 kid (7)",
+        210,
+        1,
+        "closed",
+        "Dinner is in the fridge."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-43 days','+399 minutes'))",
+      "params": [
+        "perf-claim-19",
+        "perf-cov-22",
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-36 days','+105 minutes'))",
+      "params": [
+        "perf-led-19",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{me}}",
+        "Perf Admin",
+        210,
+        "{{date:-37}}",
+        "perf-cov-22"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-35 days','+105 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-35 days','+105 minutes'), ?)",
+      "params": [
+        "perf-led-19",
+        "{{adult2}}",
+        "{{me}}",
+        1,
+        1,
+        "locked",
+        210
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-42 days','+418 minutes'))",
+      "params": [
+        "perf-cov-23",
+        "{{partner}}",
+        "Perf Partner",
+        "Doctor appointment cover",
+        "{{date:-34}}",
+        "15:00",
+        "17:30",
+        "3 kids (2, 5 & 9)",
+        150,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-40 days','+418 minutes'))",
+      "params": [
+        "perf-claim-20",
+        "perf-cov-23",
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-33 days','+110 minutes'))",
+      "params": [
+        "perf-led-20",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{partner}}",
+        "Perf Partner",
+        165,
+        "{{date:-34}}",
+        "perf-cov-23"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-32 days','+110 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-32 days','+110 minutes'), ?)",
+      "params": [
+        "perf-led-20",
+        "{{adult2}}",
+        "{{partner}}",
+        1,
+        1,
+        "locked",
+        165
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-39 days','+437 minutes'))",
+      "params": [
+        "perf-cov-24",
+        "{{adult2}}",
+        "Perf Adult",
+        "Anniversary dinner",
+        "{{date:-31}}",
+        "06:30",
+        "08:30",
+        "2 kids (8 & 10)",
+        120,
+        1,
+        "closed",
+        "Dog needs to go out at 7."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, note, claimed_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-37 days','+437 minutes'))",
+      "params": [
+        "perf-claim-21",
+        "perf-cov-24",
+        "{{partner}}",
+        "Happy to help, I can bring dinner."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-30 days','+115 minutes'))",
+      "params": [
+        "perf-led-21",
+        "{{partner}}",
+        "Perf Partner",
+        "{{adult2}}",
+        "Perf Adult",
+        150,
+        "{{date:-31}}",
+        "perf-cov-24"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-29 days','+115 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-29 days','+115 minutes'), ?)",
+      "params": [
+        "perf-led-21",
+        "{{partner}}",
+        "{{adult2}}",
+        1,
+        1,
+        "locked",
+        150
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-36 days','+456 minutes'))",
+      "params": [
+        "perf-cov-25",
+        "{{me}}",
+        "Perf Admin",
+        "Friday evening sitter needed",
+        "{{date:-28}}",
+        "13:00",
+        "16:00",
+        "2 kids (4 & 6)",
+        180,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-34 days','+456 minutes'))",
+      "params": [
+        "perf-claim-22",
+        "perf-cov-25",
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-27 days','+120 minutes'))",
+      "params": [
+        "perf-led-22",
+        "{{partner}}",
+        "Perf Partner",
+        "{{me}}",
+        "Perf Admin",
+        165,
+        "{{date:-28}}",
+        "Stayed a little late.",
+        "perf-cov-25"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-26 days','+120 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-26 days','+120 minutes'), ?)",
+      "params": [
+        "perf-led-22",
+        "{{partner}}",
+        "{{me}}",
+        1,
+        1,
+        "locked",
+        165
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-33 days','+475 minutes'))",
+      "params": [
+        "perf-cov-26",
+        "{{partner}}",
+        "Perf Partner",
+        "Saturday date night",
+        "{{date:-25}}",
+        "18:00",
+        "22:00",
+        "1 kid (7)",
+        240,
+        1,
+        "closed",
+        "Dinner is in the fridge."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-31 days','+475 minutes'))",
+      "params": [
+        "perf-claim-23",
+        "perf-cov-26",
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-24 days','+125 minutes'))",
+      "params": [
+        "perf-led-23",
+        "{{me}}",
+        "Perf Admin",
+        "{{partner}}",
+        "Perf Partner",
+        240,
+        "{{date:-25}}",
+        "perf-cov-26"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23 days','+125 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-23 days','+125 minutes'), ?)",
+      "params": [
+        "perf-led-23",
+        "{{me}}",
+        "{{partner}}",
+        1,
+        1,
+        "locked",
+        240
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-30 days','+494 minutes'))",
+      "params": [
+        "perf-cov-27",
+        "{{adult2}}",
+        "Perf Adult",
+        "School pickup and homework",
+        "{{date:-22}}",
+        "17:30",
+        "21:00",
+        "3 kids (2, 5 & 9)",
+        210,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, note, claimed_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-28 days','+494 minutes'))",
+      "params": [
+        "perf-claim-24",
+        "perf-cov-27",
+        "{{me}}",
+        "Happy to help, I can bring dinner."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-21 days','+130 minutes'))",
+      "params": [
+        "perf-led-24",
+        "{{me}}",
+        "Perf Admin",
+        "{{adult2}}",
+        "Perf Adult",
+        225,
+        "{{date:-22}}",
+        "perf-cov-27"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-20 days','+130 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-20 days','+130 minutes'), ?)",
+      "params": [
+        "perf-led-24",
+        "{{me}}",
+        "{{adult2}}",
+        1,
+        1,
+        "locked",
+        225
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-27 days','+513 minutes'))",
+      "params": [
+        "perf-cov-28",
+        "{{me}}",
+        "Perf Admin",
+        "Early morning before work",
+        "{{date:-19}}",
+        "15:00",
+        "17:30",
+        "2 kids (8 & 10)",
+        150,
+        1,
+        "closed",
+        "Dog needs to go out at 7."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-24 days','+532 minutes'))",
+      "params": [
+        "perf-cov-29",
+        "{{partner}}",
+        "Perf Partner",
+        "Sunday afternoon errand run",
+        "{{date:-16}}",
+        "06:30",
+        "08:30",
+        "2 kids (4 & 6)",
+        120,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-22 days','+532 minutes'))",
+      "params": [
+        "perf-claim-25",
+        "perf-cov-29",
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-15 days','+140 minutes'))",
+      "params": [
+        "perf-led-25",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{partner}}",
+        "Perf Partner",
+        105,
+        "{{date:-16}}",
+        "Stayed a little late.",
+        "perf-cov-29"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-14 days','+140 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-14 days','+140 minutes'), ?)",
+      "params": [
+        "perf-led-25",
+        "{{adult2}}",
+        "{{partner}}",
+        1,
+        1,
+        "locked",
+        105
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-21 days','+551 minutes'))",
+      "params": [
+        "perf-cov-30",
+        "{{adult2}}",
+        "Perf Adult",
+        "Parent-teacher conference",
+        "{{date:-13}}",
+        "13:00",
+        "16:00",
+        "1 kid (7)",
+        180,
+        1,
+        "closed",
+        "Dinner is in the fridge."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-19 days','+551 minutes'))",
+      "params": [
+        "perf-claim-26",
+        "perf-cov-30",
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+145 minutes'))",
+      "params": [
+        "perf-led-26",
+        "{{partner}}",
+        "Perf Partner",
+        "{{adult2}}",
+        "Perf Adult",
+        180,
+        "{{date:-13}}",
+        "perf-cov-30"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+145 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+145 minutes'), ?)",
+      "params": [
+        "perf-led-26",
+        "{{partner}}",
+        "{{adult2}}",
+        1,
+        1,
+        "locked",
+        180
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-18 days','+570 minutes'))",
+      "params": [
+        "perf-cov-31",
+        "{{me}}",
+        "Perf Admin",
+        "Doctor appointment cover",
+        "{{date:-10}}",
+        "18:00",
+        "22:00",
+        "3 kids (2, 5 & 9)",
+        240,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, note, claimed_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','+570 minutes'))",
+      "params": [
+        "perf-claim-27",
+        "perf-cov-31",
+        "{{partner}}",
+        "Happy to help, I can bring dinner."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+150 minutes'))",
+      "params": [
+        "perf-led-27",
+        "{{partner}}",
+        "Perf Partner",
+        "{{me}}",
+        "Perf Admin",
+        255,
+        "{{date:-10}}",
+        "perf-cov-31"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-8 days','+150 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-8 days','+150 minutes'), ?)",
+      "params": [
+        "perf-led-27",
+        "{{partner}}",
+        "{{me}}",
+        1,
+        1,
+        "locked",
+        255
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-15 days','+589 minutes'))",
+      "params": [
+        "perf-cov-32",
+        "{{partner}}",
+        "Perf Partner",
+        "Anniversary dinner",
+        "{{date:-7}}",
+        "17:30",
+        "21:00",
+        "2 kids (8 & 10)",
+        210,
+        1,
+        "closed",
+        "Dog needs to go out at 7."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-13 days','+589 minutes'))",
+      "params": [
+        "perf-claim-28",
+        "perf-cov-32",
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','+155 minutes'))",
+      "params": [
+        "perf-led-28",
+        "{{me}}",
+        "Perf Admin",
+        "{{partner}}",
+        "Perf Partner",
+        240,
+        "{{date:-7}}",
+        "perf-cov-32"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','+155 minutes'))",
+      "params": [
+        "perf-led-28",
+        "{{me}}",
+        "{{partner}}",
+        1,
+        0,
+        "pending"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+608 minutes'))",
+      "params": [
+        "perf-cov-33",
+        "{{adult2}}",
+        "Perf Adult",
+        "Friday evening sitter needed",
+        "{{date:-4}}",
+        "15:00",
+        "17:30",
+        "2 kids (4 & 6)",
+        150,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','+608 minutes'))",
+      "params": [
+        "perf-claim-29",
+        "perf-cov-33",
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 days','+160 minutes'))",
+      "params": [
+        "perf-led-29",
+        "{{me}}",
+        "Perf Admin",
+        "{{adult2}}",
+        "Perf Adult",
+        135,
+        "{{date:-4}}",
+        "Stayed a little late.",
+        "perf-cov-33"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 days','+160 minutes'))",
+      "params": [
+        "perf-led-29",
+        "{{me}}",
+        "{{adult2}}",
+        1,
+        0,
+        "pending"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+627 minutes'))",
+      "params": [
+        "perf-cov-34",
+        "{{me}}",
+        "Perf Admin",
+        "Saturday date night",
+        "{{date:-1}}",
+        "06:30",
+        "08:30",
+        "1 kid (7)",
+        120,
+        1,
+        "closed",
+        "Dinner is in the fridge."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, note, claimed_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-7 days','+627 minutes'))",
+      "params": [
+        "perf-claim-30",
+        "perf-cov-34",
+        "{{adult2}}",
+        "Happy to help, I can bring dinner."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','0 days','+165 minutes'))",
+      "params": [
+        "perf-led-30",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{me}}",
+        "Perf Admin",
+        120,
+        "{{date:-1}}",
+        "perf-cov-34"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','0 days','+165 minutes'))",
+      "params": [
+        "perf-led-30",
+        "{{adult2}}",
+        "{{me}}",
+        1,
+        0,
+        "pending"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-7 days','+646 minutes'))",
+      "params": [
+        "perf-cov-35",
+        "{{partner}}",
+        "Perf Partner",
+        "School pickup and homework",
+        "{{date:1}}",
+        "13:00",
+        "16:00",
+        "3 kids (2, 5 & 9)",
+        180,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-5 days','+646 minutes'))",
+      "params": [
+        "perf-claim-31",
+        "perf-cov-35",
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4 days','+665 minutes'))",
+      "params": [
+        "perf-cov-36",
+        "{{adult2}}",
+        "Perf Adult",
+        "Early morning before work",
+        "{{date:4}}",
+        "18:00",
+        "22:00",
+        "2 kids (8 & 10)",
+        240,
+        1,
+        "open",
+        "Dog needs to go out at 7."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+684 minutes'))",
+      "params": [
+        "perf-cov-37",
+        "{{me}}",
+        "Perf Admin",
+        "Sunday afternoon errand run",
+        "{{date:7}}",
+        "17:30",
+        "21:00",
+        "2 kids (4 & 6)",
+        210,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+684 minutes'))",
+      "params": [
+        "perf-claim-32",
+        "perf-cov-37",
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+703 minutes'))",
+      "params": [
+        "perf-cov-38",
+        "{{partner}}",
+        "Perf Partner",
+        "Parent-teacher conference",
+        "{{date:10}}",
+        "15:00",
+        "17:30",
+        "1 kid (7)",
+        150,
+        1,
+        "closed",
+        "Dinner is in the fridge."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, note, claimed_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+703 minutes'))",
+      "params": [
+        "perf-claim-33",
+        "perf-cov-38",
+        "{{me}}",
+        "Happy to help, I can bring dinner."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+722 minutes'))",
+      "params": [
+        "perf-cov-39",
+        "{{adult2}}",
+        "Perf Adult",
+        "Doctor appointment cover",
+        "{{date:13}}",
+        "06:30",
+        "08:30",
+        "3 kids (2, 5 & 9)",
+        120,
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+741 minutes'))",
+      "params": [
+        "perf-cov-40",
+        "{{me}}",
+        "Perf Admin",
+        "Anniversary dinner",
+        "{{date:16}}",
+        "13:00",
+        "16:00",
+        "2 kids (8 & 10)",
+        180,
+        1,
+        "closed",
+        "Dog needs to go out at 7."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+741 minutes'))",
+      "params": [
+        "perf-claim-34",
+        "perf-cov-40",
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+760 minutes'))",
+      "params": [
+        "perf-cov-41",
+        "{{partner}}",
+        "Perf Partner",
+        "Friday evening sitter needed",
+        "{{date:19}}",
+        "18:00",
+        "22:00",
+        "2 kids (4 & 6)",
+        240,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+760 minutes'))",
+      "params": [
+        "perf-claim-35",
+        "perf-cov-41",
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+779 minutes'))",
+      "params": [
+        "perf-cov-42",
+        "{{adult2}}",
+        "Perf Adult",
+        "Saturday date night",
+        "{{date:22}}",
+        "17:30",
+        "21:00",
+        "1 kid (7)",
+        210,
+        1,
+        "open",
+        "Dinner is in the fridge."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+798 minutes'))",
+      "params": [
+        "perf-cov-43",
+        "{{me}}",
+        "Perf Admin",
+        "School pickup and homework",
+        "{{date:25}}",
+        "15:00",
+        "17:30",
+        "3 kids (2, 5 & 9)",
+        150,
+        1,
+        "closed"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, note, claimed_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+798 minutes'))",
+      "params": [
+        "perf-claim-36",
+        "perf-cov-43",
+        "{{partner}}",
+        "Happy to help, I can bring dinner."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+817 minutes'))",
+      "params": [
+        "perf-cov-44",
+        "{{partner}}",
+        "Perf Partner",
+        "Early morning before work",
+        "{{date:28}}",
+        "06:30",
+        "08:30",
+        "2 kids (8 & 10)",
+        120,
+        1,
+        "closed",
+        "Dog needs to go out at 7."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+817 minutes'))",
+      "params": [
+        "perf-claim-37",
+        "perf-cov-44",
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+836 minutes'))",
+      "params": [
+        "perf-cov-45",
+        "{{adult2}}",
+        "Perf Adult",
+        "Sunday afternoon errand run",
+        "{{date:31}}",
+        "13:00",
+        "16:00",
+        "2 kids (4 & 6)",
+        180,
+        1,
+        "open"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_requests (id, requester_id, requester_name, title, date, start_time, end_time, kids, est_minutes, capacity, status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+855 minutes'))",
+      "params": [
+        "perf-cov-46",
+        "{{me}}",
+        "Perf Admin",
+        "Parent-teacher conference",
+        "{{date:34}}",
+        "18:00",
+        "22:00",
+        "1 kid (7)",
+        240,
+        1,
+        "closed",
+        "Dinner is in the fridge."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__coverage_claims (id, request_id, member_id, claimed_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+855 minutes'))",
+      "params": [
+        "perf-claim-38",
+        "perf-cov-46",
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4 days','+300 minutes'))",
+      "params": [
+        "perf-led-31",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{me}}",
+        "Perf Admin",
+        90,
+        "{{date:-4}}",
+        "Last-minute favor."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 days','+0 minutes'))",
+      "params": [
+        "perf-led-31",
+        "{{adult2}}",
+        "{{me}}",
+        1,
+        0,
+        "pending"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-13 days','+301 minutes'))",
+      "params": [
+        "perf-led-32",
+        "{{me}}",
+        "Perf Admin",
+        "{{adult2}}",
+        "Perf Adult",
+        105,
+        "{{date:-13}}",
+        "Last-minute favor."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, updated_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+0 minutes'))",
+      "params": [
+        "perf-led-32",
+        "{{me}}",
+        "{{adult2}}",
+        1,
+        0,
+        "pending"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-22 days','+302 minutes'))",
+      "params": [
+        "perf-led-33",
+        "{{partner}}",
+        "Perf Partner",
+        "{{me}}",
+        "Perf Admin",
+        120,
+        "{{date:-22}}",
+        "Last-minute favor."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-21 days','+0 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-21 days','+0 minutes'), ?)",
+      "params": [
+        "perf-led-33",
+        "{{partner}}",
+        "{{me}}",
+        1,
+        1,
+        "locked",
+        120
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-31 days','+303 minutes'))",
+      "params": [
+        "perf-led-34",
+        "{{me}}",
+        "Perf Admin",
+        "{{partner}}",
+        "Perf Partner",
+        135,
+        "{{date:-31}}",
+        "Last-minute favor."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-30 days','+0 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-30 days','+0 minutes'), ?)",
+      "params": [
+        "perf-led-34",
+        "{{me}}",
+        "{{partner}}",
+        1,
+        1,
+        "locked",
+        135
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-40 days','+304 minutes'))",
+      "params": [
+        "perf-led-35",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{me}}",
+        "Perf Admin",
+        150,
+        "{{date:-40}}",
+        "Last-minute favor."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-39 days','+0 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-39 days','+0 minutes'), ?)",
+      "params": [
+        "perf-led-35",
+        "{{adult2}}",
+        "{{me}}",
+        1,
+        1,
+        "locked",
+        150
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-49 days','+305 minutes'))",
+      "params": [
+        "perf-led-36",
+        "{{me}}",
+        "Perf Admin",
+        "{{adult2}}",
+        "Perf Adult",
+        165,
+        "{{date:-49}}",
+        "Last-minute favor."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+0 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-48 days','+0 minutes'), ?)",
+      "params": [
+        "perf-led-36",
+        "{{me}}",
+        "{{adult2}}",
+        1,
+        1,
+        "locked",
+        165
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-58 days','+306 minutes'))",
+      "params": [
+        "perf-led-37",
+        "{{partner}}",
+        "Perf Partner",
+        "{{me}}",
+        "Perf Admin",
+        180,
+        "{{date:-58}}",
+        "Last-minute favor."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-57 days','+0 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-57 days','+0 minutes'), ?)",
+      "params": [
+        "perf-led-37",
+        "{{partner}}",
+        "{{me}}",
+        1,
+        1,
+        "locked",
+        180
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-67 days','+307 minutes'))",
+      "params": [
+        "perf-led-38",
+        "{{me}}",
+        "Perf Admin",
+        "{{partner}}",
+        "Perf Partner",
+        195,
+        "{{date:-67}}",
+        "Last-minute favor."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-66 days','+0 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-66 days','+0 minutes'), ?)",
+      "params": [
+        "perf-led-38",
+        "{{me}}",
+        "{{partner}}",
+        1,
+        1,
+        "locked",
+        195
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-76 days','+308 minutes'))",
+      "params": [
+        "perf-led-39",
+        "{{adult2}}",
+        "Perf Adult",
+        "{{me}}",
+        "Perf Admin",
+        210,
+        "{{date:-76}}",
+        "Last-minute favor."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-75 days','+0 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-75 days','+0 minutes'), ?)",
+      "params": [
+        "perf-led-39",
+        "{{adult2}}",
+        "{{me}}",
+        1,
+        1,
+        "locked",
+        210
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-85 days','+309 minutes'))",
+      "params": [
+        "perf-led-40",
+        "{{me}}",
+        "Perf Admin",
+        "{{adult2}}",
+        "Perf Adult",
+        225,
+        "{{date:-85}}",
+        "Last-minute favor."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, locked_at, updated_at, minutes) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','+0 minutes'), strftime('%Y-%m-%dT%H:%M:%fZ','now','-84 days','+0 minutes'), ?)",
+      "params": [
+        "perf-led-40",
+        "{{me}}",
+        "{{adult2}}",
+        1,
+        1,
+        "locked",
+        225
+      ]
+    }
+  ]
+}
