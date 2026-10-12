@@ -77,6 +77,230 @@
           "selector": "[data-testid=\"claim-btn\"][data-request-id=\"bc-req\"]"
         }
       ]
+    },
+    {
+      "name": "a sitting changed after it was logged shows the logged length, says what it reads now, and offers no confirm; once confirmed, the recorded length is what counts",
+      "members": {
+        "sitter": "adult",
+        "parent": "adult"
+      },
+      "steps": [
+        {
+          "action": "open",
+          "as": "sitter"
+        },
+        {
+          "action": "click",
+          "as": "sitter",
+          "selector": "[data-log]"
+        },
+        {
+          "action": "select",
+          "as": "sitter",
+          "selector": "#f-parent",
+          "value": "{{parent}}"
+        },
+        {
+          "action": "fill",
+          "as": "sitter",
+          "selector": "#f-hours",
+          "value": "2"
+        },
+        {
+          "action": "fill",
+          "as": "sitter",
+          "selector": "#f-mins",
+          "value": "0"
+        },
+        {
+          "action": "click",
+          "as": "sitter",
+          "selector": "[data-submit-log]"
+        },
+        {
+          "action": "expectText",
+          "as": "sitter",
+          "selector": "[data-testid=\"entry-card\"] [data-testid=\"entry-minutes\"]",
+          "text": "You earned +2h"
+        },
+        {
+          "action": "seedRaw",
+          "sql": "UPDATE app_babysitting_coop__ledger_entries SET minutes = 600 WHERE sitter_id = ?",
+          "params": [
+            "{{sitter}}"
+          ]
+        },
+        {
+          "action": "open",
+          "as": "parent"
+        },
+        {
+          "action": "expectText",
+          "as": "parent",
+          "selector": "[data-testid=\"entry-card\"] [data-testid=\"entry-minutes\"]",
+          "text": "You owe 2h"
+        },
+        {
+          "action": "expectText",
+          "as": "parent",
+          "selector": "[data-testid=\"terms-changed\"]",
+          "text": "now reads 10h"
+        },
+        {
+          "action": "expectCount",
+          "as": "parent",
+          "selector": "[data-testid=\"confirm-btn\"]",
+          "count": 0
+        },
+        {
+          "action": "seedRaw",
+          "sql": "UPDATE app_babysitting_coop__ledger_entries SET minutes = 120 WHERE sitter_id = ?",
+          "params": [
+            "{{sitter}}"
+          ]
+        },
+        {
+          "action": "reload",
+          "as": "parent"
+        },
+        {
+          "action": "expectText",
+          "as": "parent",
+          "selector": "[data-testid=\"entry-card\"] [data-testid=\"entry-minutes\"]",
+          "text": "You owe 2h"
+        },
+        {
+          "action": "expectCount",
+          "as": "parent",
+          "selector": "[data-testid=\"terms-changed\"]",
+          "count": 0
+        },
+        {
+          "action": "click",
+          "as": "parent",
+          "selector": "[data-testid=\"confirm-btn\"]"
+        },
+        {
+          "action": "expectVisible",
+          "as": "parent",
+          "selector": "[data-testid=\"entry-card\"][data-entry-status=\"confirmed\"]"
+        },
+        {
+          "action": "seedRaw",
+          "sql": "UPDATE app_babysitting_coop__ledger_entries SET minutes = 600 WHERE sitter_id = ?",
+          "params": [
+            "{{sitter}}"
+          ]
+        },
+        {
+          "action": "reload",
+          "as": "parent"
+        },
+        {
+          "action": "expectVisible",
+          "as": "parent",
+          "selector": "[data-testid=\"entry-card\"][data-entry-status=\"confirmed\"]"
+        },
+        {
+          "action": "expectText",
+          "as": "parent",
+          "selector": "[data-testid=\"entry-card\"] [data-testid=\"entry-minutes\"]",
+          "text": "You owe 2h"
+        },
+        {
+          "action": "expectNoText",
+          "as": "parent",
+          "selector": "[data-testid=\"entry-card\"]",
+          "text": "10h"
+        }
+      ]
+    },
+    {
+      "name": "confirming a sitting whose length changed while the card was open confirms nothing and shows the length it reads now",
+      "members": {
+        "sitter": "adult",
+        "parent": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, created_at) VALUES ('bc-x', ?, ?, ?, ?, 90, '2026-08-01', '2026-08-01T09:00:00Z')",
+          "params": [
+            "{{sitter}}",
+            "Sam Sitter",
+            "{{parent}}",
+            "Pat Parent"
+          ]
+        },
+        {
+          "action": "open",
+          "as": "parent"
+        },
+        {
+          "action": "expectText",
+          "as": "parent",
+          "selector": "[data-testid=\"entry-card\"][data-entry-id=\"bc-x\"] [data-testid=\"entry-minutes\"]",
+          "text": "You owe 1h 30m"
+        },
+        {
+          "action": "seedRaw",
+          "sql": "UPDATE app_babysitting_coop__ledger_entries SET minutes = 600 WHERE id = 'bc-x'"
+        },
+        {
+          "action": "click",
+          "as": "parent",
+          "selector": "[data-testid=\"confirm-btn\"][data-entry-id=\"bc-x\"]"
+        },
+        {
+          "action": "expectText",
+          "as": "parent",
+          "selector": ".error",
+          "text": "nothing was confirmed"
+        },
+        {
+          "action": "expectText",
+          "as": "parent",
+          "selector": "[data-testid=\"entry-card\"][data-entry-id=\"bc-x\"] [data-testid=\"entry-minutes\"]",
+          "text": "You owe 10h"
+        },
+        {
+          "action": "expectVisible",
+          "as": "parent",
+          "selector": "[data-testid=\"confirm-btn\"][data-entry-id=\"bc-x\"]"
+        },
+        {
+          "action": "reload",
+          "as": "parent"
+        },
+        {
+          "action": "expectText",
+          "as": "parent",
+          "selector": "[data-testid=\"entry-card\"][data-entry-id=\"bc-x\"] [data-testid=\"entry-minutes\"]",
+          "text": "You owe 10h"
+        },
+        {
+          "action": "click",
+          "as": "parent",
+          "selector": "[data-testid=\"confirm-btn\"][data-entry-id=\"bc-x\"]"
+        },
+        {
+          "action": "expectText",
+          "as": "parent",
+          "selector": ".notice",
+          "text": "Confirmed 10h"
+        },
+        {
+          "action": "expectCount",
+          "as": "parent",
+          "selector": "[data-testid=\"confirm-btn\"][data-entry-id=\"bc-x\"]",
+          "count": 0
+        },
+        {
+          "action": "expectVisible",
+          "as": "parent",
+          "selector": "[data-testid=\"entry-card\"][data-entry-id=\"bc-x\"][data-entry-status=\"pending\"]"
+        }
+      ]
     }
   ]
 }

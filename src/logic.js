@@ -112,6 +112,25 @@ export function confirmedMinutes(agreement, entry) {
   return snap != null && snap !== "" ? snap : entry?.minutes;
 }
 
+/**
+ * The sitting length an entry stands for. The hub records it with the first
+ * confirmation (manifest agreements.snapshot_columns) and locks on what it
+ * recorded, whatever the ledger entry says by then — so once either party has
+ * confirmed, the recorded length is the one to show and to confirm, and
+ * `changed` says a still-pending entry no longer reads the same. Before anyone
+ * confirms there is only the entry.
+ */
+export function entryTerms(entry, agreement) {
+  const confirmedByAnyone = !!(agreement && (agreement.sitter_agreed || agreement.parent_agreed));
+  if (!confirmedByAnyone) return { minutes: entry.minutes, recorded: false, changed: false };
+  const pending = !isConfirmed(agreement);
+  const snap = agreement.minutes;
+  // A confirmation older than the recorded length carries none: the entry is
+  // all there is to show, and nothing says it is what was confirmed.
+  if (snap == null || snap === "") return { minutes: entry.minutes, recorded: false, changed: pending };
+  return { minutes: snap, recorded: true, changed: pending && snap !== entry.minutes };
+}
+
 function bump(map, partnerId, partnerName, delta) {
   const cur = map.get(partnerId) || { partnerId, partnerName, net: 0 };
   cur.net += delta;

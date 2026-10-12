@@ -137,7 +137,7 @@ import { esc, isAdult as sdkIsAdult, memberColor, initial, hubConfirm, searchMat
 import { sendHubNotification, hubAppUrl } from "/hub-sdk.js";
 import {
   toMinutes, minutesToLabel, isConfirmed, needsMyConfirmation,
-  computeBalances, confirmedMinutes, claimCount, isFull, canClaim, claimErrorMessage, searchableFields,
+  computeBalances, entryTerms, claimCount, isFull, canClaim, claimErrorMessage, searchableFields,
   buildCalendarEvents,
 } from "./logic.js";
 
@@ -195,15 +195,22 @@ async function db(sql, params = []) {
 
 // api/agree writes the endpoint_only ledger_agreements table; a participant may
 // only set THEIR OWN flag. First call bootstraps the row from ledger_entries.
-async function agreeOnServer(id, agreed) {
+// `terms` is the length this page is showing ({ minutes }, an integer): the hub
+// refuses the confirmation (409) when the length it holds, or would record,
+// is not that one.
+async function agreeOnServer(id, agreed, terms) {
   if (!DB) return;
   const res = await fetch(`/run/${APP_ID}/api/agree`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ table: "ledger_agreements", id, agreed }),
+    body: JSON.stringify({ table: "ledger_agreements", id, agreed, ...(terms ? { expected_snapshot: terms } : {}) }),
   });
   const json = await res.json().catch(() => null);
-  if (!res.ok || !json || typeof json !== "object" || json.error) throw new Error(json?.error || "Could not record agreement.");
+  if (!res.ok || !json || typeof json !== "object" || json.error) {
+    const err = new Error(json?.error || "Could not record agreement.");
+    err.status = res.status;
+    throw err;
+  }
   return json;
 }
 
@@ -317,11 +324,12 @@ async function submitLogHours() {
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [id, me.id, me.name, parentId, parent.name, minutes, occurred, note, requestId, created]
       );
-      // Seed the agreement row and record the sitter's own consent.
-      await agreeOnServer(id, true);
+      // Seed the agreement row and record the sitter's own consent to exactly
+      // what was just written.
+      await agreeOnServer(id, true, { minutes });
     }
     entries = [entry, ...entries];
-    const agreement = { id, sitter_id: me.id, parent_id: parentId, sitter_agreed: 1, parent_agreed: 0, status: "pending", locked_at: null, updated_at: created };
+    const agreement = { id, sitter_id: me.id, parent_id: parentId, sitter_agreed: 1, parent_agreed: 0, status: "pending", locked_at: null, updated_at: created, minutes };
     agreements = [agreement, ...agreements];
     rebuildAgreementIndex();
 
@@ -353,26 +361,57 @@ async function submitLogHours() {
   }
 }
 
+const ENTRY_CHANGED = "This entry changed, so nothing was confirmed. Check it again.";
+
 async function confirmEntry(id) {
   const entry = entries.find(e => e.id === id);
   if (!entry || entry.parent_id !== me?.id) { showError("Only the parent named on the entry can confirm it."); return; }
+  const terms = entryTerms(entry, agreementsById.get(id));
+  if (terms.changed) return;
+  const minutes = terms.minutes;
+  let locked = true;
   try {
-    if (DB) await agreeOnServer(id, true);
+    if (DB) {
+      // Read it again first: a confirmation is for the length on the card that
+      // was pressed, so an entry that reads differently by now is shown as it
+      // is instead. The hub makes the same comparison (409 below) for a change
+      // that lands after this read.
+      await loadData();
+      const now = entries.find(e => e.id === id);
+      const agr = agreementsById.get(id);
+      const nowTerms = now && entryTerms(now, agr);
+      if (!now || nowTerms.changed || nowTerms.minutes !== minutes || !needsMyConfirmation(now, agr, me?.id)) {
+        showError(ENTRY_CHANGED);
+        return;
+      }
+      locked = !!(await agreeOnServer(id, true, { minutes }))?.locked;
+      await loadData().catch(() => {});
+    }
     const a = agreementsById.get(id);
-    if (a) { a.parent_agreed = 1; a.sitter_agreed = 1; a.status = "locked"; a.locked_at = nowIso(); }
+    if (!DB && a) { a.parent_agreed = 1; a.sitter_agreed = 1; a.status = "locked"; a.locked_at = nowIso(); a.minutes = minutes; }
     rebuildAgreementIndex();
-    showNotice(`Confirmed ${minutesToLabel(entry.minutes)} with ${entry.sitter_name}.`);
+    // Counted only once both have confirmed; the sitter's own confirmation can
+    // be missing when logging the entry was cut short.
+    if (!locked) { showNotice(`Confirmed ${minutesToLabel(minutes)} — waiting for ${entry.sitter_name} to confirm.`); return; }
+    showNotice(`Confirmed ${minutesToLabel(minutes)} with ${entry.sitter_name}.`);
 
     fetch(EVENTS_URL, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ source_app_id: APP_ID, type: "babysitting.hours_confirmed", subject_id: entry.sitter_id,
-        payload: { minutes: entry.minutes, sitter_id: entry.sitter_id, parent_id: entry.parent_id } }),
+        payload: { minutes, sitter_id: entry.sitter_id, parent_id: entry.parent_id } }),
     }).catch(() => {});
     sendHubNotification({
-      title: "Hours confirmed", body: `${me.name} confirmed ${minutesToLabel(entry.minutes)} of sitting.`,
+      title: "Hours confirmed", body: `${me.name} confirmed ${minutesToLabel(minutes)} of sitting.`,
       audience: [entry.sitter_id], url: hubAppUrl(APP_ID, {}),
     }).catch(() => {});
-  } catch (e) { showError(e.message); }
+  } catch (e) {
+    if (e.status === 409) {
+      await loadData().catch(() => {});
+      showError(ENTRY_CHANGED);
+      return;
+    }
+    showError(e.message);
+  }
 }
 
 async function deleteEntry(id) {
@@ -679,26 +718,36 @@ function renderEntryRow(entry) {
   const iAmSitter = entry.sitter_id === me?.id;
   const counterId = iAmSitter ? entry.parent_id : entry.sitter_id;
   const counterName = iAmSitter ? entry.parent_name : entry.sitter_name;
-  // Show the frozen snapshot amount for confirmed entries so the displayed value
-  // always matches what the balance counts (a post-confirmation edit is ignored).
-  const shownMinutes = confirmed ? confirmedMinutes(agreement, entry) : entry.minutes;
+  // From the first confirmation on, show the length the hub recorded with it:
+  // that is what a second confirmation locks and what the balance counts (an
+  // edit to the entry afterwards is ignored, and said so while still pending).
+  const terms = entryTerms(entry, agreement);
+  const shownMinutes = terms.minutes;
+  const undo = iAmSitter ? "Withdraw it and log it again" : "Decline it and ask for it to be logged again";
+  const changedNote = !terms.changed ? ""
+    : terms.recorded
+      ? `This entry was changed after it was confirmed and now reads ${minutesToLabel(entry.minutes)}. Nobody has confirmed that. ${undo}.`
+      : `This entry was confirmed before its length was recorded. ${undo}.`;
   const dir = iAmSitter
     ? `<span class="pill good">You earned +${esc(minutesToLabel(shownMinutes))}</span>`
     : `<span class="pill warn">You owe ${esc(minutesToLabel(shownMinutes))}</span>`;
   const statusPill = confirmed
     ? `<span class="pill good">Confirmed</span>`
     : `<span class="pill info">Pending</span>`;
-  const canConfirm = needsMyConfirmation(entry, agreement, me?.id) && entry.parent_id === me?.id;
+  // Not while the entry reads differently from what was confirmed: there is
+  // nothing on this card both sides could be confirming.
+  const canConfirm = needsMyConfirmation(entry, agreement, me?.id) && entry.parent_id === me?.id && !terms.changed;
   const actions = [];
-  if (canConfirm) actions.push(`<button class="btn btn-sm" data-confirm="${esc(entry.id)}">Confirm</button>`);
+  if (canConfirm) actions.push(`<button class="btn btn-sm" data-testid="confirm-btn" data-entry-id="${esc(entry.id)}" data-confirm="${esc(entry.id)}">Confirm</button>`);
   if (!confirmed) actions.push(`<button class="btn btn-quiet-danger" data-del-entry="${esc(entry.id)}">${iAmSitter ? "Withdraw" : "Decline"}</button>`);
   return `
-    <div class="card">
+    <div class="card" data-testid="entry-card" data-entry-id="${esc(entry.id)}" data-entry-status="${confirmed ? "confirmed" : "pending"}">
       <div class="row-card">
         <div>
           <div class="item-title">${esc(counterName)}</div>
           <div class="item-meta">${esc(fmtDate(entry.occurred_on))}${entry.note ? ` · ${esc(entry.note)}` : ""}</div>
-          <div style="margin-top:8px">${dir}</div>
+          <div style="margin-top:8px" data-testid="entry-minutes">${dir}</div>
+          ${changedNote ? `<div class="item-meta" data-testid="terms-changed">${esc(changedNote)}</div>` : ""}
         </div>
         <div style="text-align:right;display:grid;gap:8px;justify-items:end">
           ${statusPill}

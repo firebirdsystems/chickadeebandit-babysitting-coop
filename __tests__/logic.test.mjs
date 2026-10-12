@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   toMinutes, minutesToLabel, entryStatus, isConfirmed, needsMyConfirmation,
-  computeBalances, claimCount, isFull, canClaim, claimErrorMessage, canLogHours, searchableFields,
+  computeBalances, entryTerms, claimCount, isFull, canClaim, claimErrorMessage, canLogHours, searchableFields,
   buildCalendarEvents, CALENDAR_EXPORT_HORIZON_DAYS, CALENDAR_EXPORT_MAX_EVENTS,
 } from "../src/logic.js";
 
@@ -46,6 +46,29 @@ describe("agreement state", () => {
   });
   it("a non-participant never needs to confirm", () => {
     expect(needsMyConfirmation(entry, pending, "stranger")).toBe(false);
+  });
+});
+
+describe("entryTerms", () => {
+  const entry = { id: "e1", sitter_id: "s", parent_id: "p", minutes: 120 };
+  it("reads the entry until someone confirms", () => {
+    expect(entryTerms(entry, undefined)).toEqual({ minutes: 120, recorded: false, changed: false });
+    expect(entryTerms(entry, { status: "pending", sitter_agreed: 0, parent_agreed: 0, minutes: null }))
+      .toEqual({ minutes: 120, recorded: false, changed: false });
+  });
+  it("reads the length recorded with a confirmation, and says when the entry has moved", () => {
+    const agr = { status: "pending", sitter_agreed: 1, parent_agreed: 0, minutes: 120 };
+    expect(entryTerms(entry, agr)).toEqual({ minutes: 120, recorded: true, changed: false });
+    expect(entryTerms({ ...entry, minutes: 600 }, agr)).toEqual({ minutes: 120, recorded: true, changed: true });
+  });
+  it("a confirmed entry keeps its recorded length and is never called changed", () => {
+    const agr = { status: "locked", sitter_agreed: 1, parent_agreed: 1, minutes: 120 };
+    expect(entryTerms({ ...entry, minutes: 600 }, agr)).toEqual({ minutes: 120, recorded: true, changed: false });
+    expect(entryTerms(entry, { ...agr, minutes: null })).toEqual({ minutes: 120, recorded: false, changed: false });
+  });
+  it("flags a pending confirmation that carries no recorded length", () => {
+    expect(entryTerms(entry, { status: "pending", sitter_agreed: 1, parent_agreed: 0, minutes: null }))
+      .toEqual({ minutes: 120, recorded: false, changed: true });
   });
 });
 

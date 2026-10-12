@@ -184,6 +184,78 @@
           "expect": { "status": 200, "rowCount": 1 }
         }
       ]
+    },
+    {
+      "name": "the length recorded with the sitter's confirmation is not moved by a later edit to the pending entry, and neither party can rewrite it",
+      "members": {
+        "sitter": "adult",
+        "parent": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_babysitting_coop__ledger_entries (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, created_at) VALUES ('l9', ?, 'Sitter', ?, 'Parent', 120, '2026-01-01', '2026-01-01T00:00:00Z')",
+          "params": [
+            "{{sitter}}",
+            "{{parent}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_babysitting_coop__ledger_agreements (id, sitter_id, parent_id, sitter_agreed, parent_agreed, status, updated_at, minutes) VALUES ('l9', ?, ?, 1, 0, 'pending', '2026-01-02T00:00:00Z', 120)",
+          "params": [
+            "{{sitter}}",
+            "{{parent}}"
+          ]
+        },
+        {
+          "action": "db",
+          "as": "sitter",
+          "sql": "UPDATE app_babysitting_coop__ledger_entries SET minutes = 600 WHERE id = 'l9' RETURNING id",
+          "expect": {
+            "status": 200,
+            "rowCount": 1
+          }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "SELECT minutes, sitter_agreed FROM app_babysitting_coop__ledger_agreements WHERE id = 'l9'",
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "minutes": 120,
+                "sitter_agreed": 1
+              }
+            ]
+          }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "SELECT minutes FROM app_babysitting_coop__ledger_entries WHERE id = 'l9'",
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "minutes": 600
+              }
+            ]
+          }
+        },
+        {
+          "action": "db",
+          "as": "sitter",
+          "sql": "UPDATE app_babysitting_coop__ledger_agreements SET minutes = 600 WHERE id = 'l9'",
+          "expect": {
+            "status": 403,
+            "errorIncludes": "endpoint"
+          }
+        }
+      ]
     }
   ]
 }
