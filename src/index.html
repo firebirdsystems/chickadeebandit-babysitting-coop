@@ -111,6 +111,8 @@
     .modal h2 { margin-bottom: 12px; }
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
     .empty, .loading { color: var(--muted); text-align: center; padding: 32px 16px; }
+    .load-error { margin: 0 0 12px; padding: 10px 14px; border-radius: 10px; background: var(--hub-tint-danger, #fee2e2); color: var(--hub-tint-danger-fg, #b91c1c); font-size: 0.9rem; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+    .load-error-retry { background: none; border: 1px solid currentColor; border-radius: 8px; padding: 5px 10px; font: inherit; font-weight: 600; color: inherit; cursor: pointer; flex-shrink: 0; }
     .error { background: var(--red-soft); color: var(--red); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
     .notice { background: var(--green-soft); color: var(--green); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
     .two { display: grid; gap: 10px; }
@@ -186,8 +188,8 @@ async function db(sql, params = []) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ sql, params }),
   });
-  const json = await res.json();
-  if (json.error) throw new Error(json.error);
+  const json = await res.json().catch(() => null);
+  if (!res.ok || !json || typeof json !== "object" || json.error) throw new Error(json?.error || "Couldn’t reach the hub. Try again.");
   return json;
 }
 
@@ -200,8 +202,8 @@ async function agreeOnServer(id, agreed) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ table: "ledger_agreements", id, agreed }),
   });
-  const json = await res.json().catch(() => ({}));
-  if (!res.ok || json.error) throw new Error(json.error || "Could not record agreement.");
+  const json = await res.json().catch(() => null);
+  if (!res.ok || !json || typeof json !== "object" || json.error) throw new Error(json?.error || "Could not record agreement.");
   return json;
 }
 
@@ -218,10 +220,13 @@ async function loadMembers() {
       { id: "demo-3", name: "Sam Patel", role: "adult" },
     ];
   } else {
-    try {
-      const res = await fetch(`${CONTEXT}?keys=family.members`);
-      members = ((await res.json())["family.members"]) ?? [];
-    } catch { members = []; }
+    // A roster that cannot be read is a failed load, not an empty co-op.
+    const res = await fetch(`${CONTEXT}?keys=family.members`);
+    const json = await res.json().catch(() => null);
+    if (!res.ok || !json || typeof json !== "object") throw new Error("Couldn’t reach the hub. Try again.");
+    // A 200 can still name a key the hub failed to read: that is a failed read too.
+    if (Array.isArray(json.$errors) && json.$errors.includes("family.members")) throw new Error("Couldn’t reach the hub. Try again.");
+    members = json["family.members"] ?? [];
   }
   memberMap = new Map(members.map(m => [m.id, m]));
   me = HUB_MEMBER ?? members[0] ?? { id: "guest", name: "Guest", role: "adult" };
@@ -263,15 +268,21 @@ function seedDemo() {
   rebuildAgreementIndex();
 }
 
+// The first load failed: the ledger is unknown, not empty. A later refresh
+// that fails keeps what is on screen and says so inline.
+let loaded = false;
+let loadFailed = false;
+
 async function refresh() {
   clearMessages();
   try {
     await loadMembers();
     await loadData();
-    render();
+    loaded = true; loadFailed = false;
   } catch (e) {
-    error = e.message; render();
+    if (loaded) error = e.message; else loadFailed = true;
   }
+  render();
 }
 
 // ── Ledger actions ────────────────────────────────────────────────────────────
@@ -378,7 +389,16 @@ async function deleteEntry(id) {
   );
   if (!ok) return;
   try {
-    if (DB) await db(`DELETE FROM ${T.entries} WHERE id = ?`, [id]);
+    if (DB) {
+      // The ledger is party-scoped: the hub answers 200 with nothing changed
+      // when this member may not remove the row, so re-read instead.
+      const res = await db(`DELETE FROM ${T.entries} WHERE id = ?`, [id]);
+      if (res.changed === 0) {
+        await loadData().catch(() => {});
+        showError("Nothing was removed. This entry can no longer be changed.");
+        return;
+      }
+    }
     entries = entries.filter(e => e.id !== id);
     showNotice(mine ? "Sitting withdrawn." : "Hours declined.");
   } catch (e) { showError(e.message); }
@@ -464,8 +484,8 @@ async function claimRequest(requestId) {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slot_id: requestId }),
       });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok || json.error) { await loadData().catch(() => {}); showError(claimErrorMessage(json)); return; }
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json || typeof json !== "object" || json.error) { await loadData().catch(() => {}); showError(claimErrorMessage(json)); return; }
       if (json.claim_id) claim.id = json.claim_id;
     }
     claims = [...claims, claim];
@@ -486,8 +506,8 @@ async function releaseRequest(requestId) {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slot_id: requestId }),
       });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok || json.error) { showError(json.error || "Could not withdraw."); return; }
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json || typeof json !== "object" || json.error) { showError(json.error || "Could not withdraw."); return; }
     }
     claims = claims.filter(c => c.id !== mineClaim.id);
     showNotice("You withdrew your offer.");
@@ -785,11 +805,13 @@ function render() {
         <h1>Babysitting Co-op</h1>
         <p class="muted tiny">Trade sitting hours and keep the ledger square.</p>
       </div>
-      <button class="btn btn-ghost btn-sm" data-refresh>Refresh</button>
+      ${loadFailed ? "" : `<button class="btn btn-ghost btn-sm" data-refresh>Refresh</button>`}
     </div>
     ${renderTabs()}
     ${renderMessages()}
-    ${view === "ledger" ? renderLedger() : renderCoverage()}
+    ${loadFailed
+      ? `<div class="load-error" data-testid="load-error" role="alert"><span>Couldn’t load the co-op ledger.</span> <button type="button" class="load-error-retry" data-testid="load-retry">Try again</button></div>`
+      : view === "ledger" ? renderLedger() : renderCoverage()}
   `;
 }
 
@@ -801,7 +823,7 @@ document.addEventListener("click", (event) => {
   if (t.hasAttribute("data-close")) return closeModal();
   if (t.hasAttribute("data-close-req")) return closeRequest(attr("data-close-req"));
   if (t.hasAttribute("data-tab")) { view = attr("data-tab"); clearMessages(); render(); return; }
-  if (t.hasAttribute("data-refresh")) return refresh();
+  if (t.hasAttribute("data-refresh") || t.dataset.testid === "load-retry") return refresh();
   if (t.hasAttribute("data-log")) return openLogHoursModal();
   if (t.hasAttribute("data-submit-log")) return submitLogHours();
   if (t.hasAttribute("data-confirm")) return confirmEntry(attr("data-confirm"));
