@@ -91,7 +91,6 @@ Declare `resource_limits` even when accepting defaults, so limits are explicit:
   "max_store_bytes": 524288,         // kv apps: max KV storage (default 5 MB)
   "max_store_reads_per_day": 500,    // kv apps: read requests per day (default 1000)
   "max_store_writes_per_day": 200,   // kv apps: write requests per day (default 500)
-  "max_db_bytes": 52428800,          // db apps: SQLite/Postgres size cap (default 200 MB)
   "max_file_bytes": 10485760,        // file-uploading apps: max size per file (default 10 MB)
   "max_files_bytes": 524288000       // file-uploading apps: total file storage (default 500 MB)
 }
