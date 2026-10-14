@@ -136,7 +136,10 @@ describe("coverage claiming", () => {
     expect(claimErrorMessage({ reason: "slot_full" })).toMatch(/last opening/);
     expect(claimErrorMessage({ reason: "already_claimed" })).toMatch(/already/);
     expect(claimErrorMessage({ reason: "slot_closed" })).toMatch(/no longer open/);
-    expect(claimErrorMessage({})).toMatch(/Could not claim/);
+    expect(claimErrorMessage({})).toBe("Couldn’t claim the request — try again.");
+    expect(claimErrorMessage({ error: "hub text" }, 500)).toBe("Couldn’t claim the request — try again.");
+    expect(claimErrorMessage({ error: "hub text" }, 403)).toBe("You don’t have permission to claim the request.");
+    expect(claimErrorMessage(null, 404)).toBe("This request has been removed.");
   });
 });
 

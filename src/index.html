@@ -138,7 +138,7 @@ import { sendHubNotification, hubAppUrl } from "/hub-sdk.js";
 import {
   toMinutes, minutesToLabel, isConfirmed, needsMyConfirmation,
   computeBalances, entryTerms, claimCount, isFull, canClaim, claimErrorMessage, searchableFields,
-  buildCalendarEvents,
+  buildCalendarEvents, outcomeUnknown, storedDiffers, SAVED_AS_FIRST, failureLine,
 } from "./logic.js";
 
 const CONTEXT = window.__CONTEXT_URL ?? "";
@@ -189,8 +189,16 @@ async function db(sql, params = []) {
     body: JSON.stringify({ sql, params }),
   });
   const json = await res.json().catch(() => null);
-  if (!res.ok || !json || typeof json !== "object" || json.error) throw new Error(json?.error || "Couldn’t reach the hub. Try again.");
+  if (!res.ok || !json || typeof json !== "object" || json.error) throw Object.assign(new Error(json?.error || "Couldn’t reach the hub. Try again."), { status: res.status, code: json?.code });
   return json;
+}
+
+// After a write that changed nothing: whether the row is still there
+// (true / false), or null when the re-read itself failed. failureLine turns
+// that into "removed" or the permission line.
+async function rowFound(table, id) {
+  try { return !!(await db(`SELECT id FROM ${table} WHERE id = ?`, [id])).rows?.length; }
+  catch (e) { console.error(e); return null; }
 }
 
 // api/agree writes the endpoint_only ledger_agreements table; a participant may
@@ -209,6 +217,7 @@ async function agreeOnServer(id, agreed, terms) {
   if (!res.ok || !json || typeof json !== "object" || json.error) {
     const err = new Error(json?.error || "Could not record agreement.");
     err.status = res.status;
+    if (typeof json?.code === "string") err.code = json.code;
     throw err;
   }
   return json;
@@ -287,7 +296,8 @@ async function refresh() {
     await loadData();
     loaded = true; loadFailed = false;
   } catch (e) {
-    if (loaded) error = e.message; else loadFailed = true;
+    console.error(e);
+    if (loaded) error = "Couldn’t refresh."; else loadFailed = true;
   }
   render();
 }
@@ -310,55 +320,88 @@ async function submitLogHours() {
   const btn = modalEl?.querySelector(".modal-actions .btn-primary");
   if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
 
-  const id = crypto.randomUUID();
+  // The id is the open form's, minted on its first send and sent on every
+  // retry: a try whose answer was lost may have stored the entry (and its
+  // agreement), and a second press must find it rather than log it twice.
+  const host = modalEl;
+  const id = host ? (host.dataset.rowId ||= crypto.randomUUID()) : crypto.randomUUID();
   const created = nowIso();
-  const entry = {
+  const typed = { parent_id: parentId, minutes, occurred_on: occurred, note, request_id: requestId };
+  let entry = {
     id, sitter_id: me.id, sitter_name: me.name, parent_id: parentId, parent_name: parent.name,
     minutes, occurred_on: occurred, note, request_id: requestId, created_at: created,
   };
+  let savedNote = "";
 
   try {
     if (DB) {
-      await db(
-        `INSERT INTO ${T.entries} (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, request_id, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [id, me.id, me.name, parentId, parent.name, minutes, occurred, note, requestId, created]
-      );
-      // Seed the agreement row and record the sitter's own consent to exactly
-      // what was just written.
-      await agreeOnServer(id, true, { minutes });
-    }
-    entries = [entry, ...entries];
-    const agreement = { id, sitter_id: me.id, parent_id: parentId, sitter_agreed: 1, parent_agreed: 0, status: "pending", locked_at: null, updated_at: created, minutes };
-    agreements = [agreement, ...agreements];
-    rebuildAgreementIndex();
-
-    // Auto-close the linked coverage request. coverage_requests is adult_writable,
-    // so the sitter (an adult) is permitted to flip its status. Best-effort — a
-    // failure here must not discard the logged hours.
-    const linked = requestId ? requests.find(r => r.id === requestId) : null;
-    if (linked && linked.status === "open") {
       try {
-        if (DB) await db(`UPDATE ${T.requests} SET status = 'closed' WHERE id = ?`, [requestId]);
-        linked.status = "closed";
-        syncCalendar();
-      } catch { /* leave the request open; the poster can close it manually */ }
+        await db(
+          `INSERT INTO ${T.entries} (id, sitter_id, sitter_name, parent_id, parent_name, minutes, occurred_on, note, request_id, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [id, me.id, me.name, parentId, parent.name, minutes, occurred, note, requestId, created]
+        );
+      } catch (e) {
+        // Unknown outcome: read the entry back by the pinned id. Found means an
+        // earlier try stored it; the agreement below is then sent (again — the
+        // sitter's own flag, so sending it twice changes nothing). Not found,
+        // or the read failed: the log fails, the id stays pinned.
+        if (!outcomeUnknown(e)) throw e;
+        let stored = null;
+        try { stored = (await db(`SELECT * FROM ${T.entries} WHERE id = ?`, [id])).rows?.[0] ?? null; }
+        catch (readErr) {
+          // The id is ours: with the read-back failed, a UNIQUE answer may be this
+          // form's own first try, so nothing is known — "try again", not "already exists".
+          console.error(readErr);
+          throw new Error("create outcome unknown", { cause: e });
+        }
+        if (!stored) throw e;
+        console.error(e);
+        // Edited since that first try: what was stored is kept, and said so.
+        if (storedDiffers(stored, typed)) savedNote = SAVED_AS_FIRST;
+        entry = { ...stored, minutes: Number(stored.minutes) || 0 };
+      }
+      // Seed the agreement row and record the sitter's own consent to exactly
+      // what was stored.
+      await agreeOnServer(id, true, { minutes: entry.minutes });
     }
-
-    closeModal();
-    showNotice(`Logged ${minutesToLabel(minutes)} — waiting for ${parent.name} to confirm.${linked ? " Coverage request closed." : ""}`);
-
-    // Ask the parent to confirm (targeted, non-blocking).
-    sendHubNotification({
-      title: "Confirm babysitting hours",
-      body: `${me.name} logged ${minutesToLabel(minutes)} of sitting for you.`,
-      audience: [parentId],
-      url: hubAppUrl(APP_ID, {}),
-    }).catch(() => {});
   } catch (e) {
+    console.error(e);
     if (btn) { btn.disabled = false; btn.textContent = "Log hours"; }
-    showError(e.message);
+    showError(failureLine(e, { action: "log the hours", thing: "entry" }));
+    return;
   }
+
+  if (host) delete host.dataset.rowId;
+  const parentName = memberMap.get(entry.parent_id)?.name ?? entry.parent_name ?? parent.name;
+  entries = [entry, ...entries.filter(x => x.id !== id)];
+  const agreement = { id, sitter_id: me.id, parent_id: entry.parent_id, sitter_agreed: 1, parent_agreed: 0, status: "pending", locked_at: null, updated_at: created, minutes: entry.minutes };
+  agreements = [agreement, ...agreements.filter(a => a.id !== id)];
+  rebuildAgreementIndex();
+
+  // Auto-close the linked coverage request. coverage_requests is adult_writable,
+  // so the sitter (an adult) is permitted to flip its status. Best-effort — a
+  // failure here must not discard the logged hours.
+  const linked = entry.request_id ? requests.find(r => r.id === entry.request_id) : null;
+  if (linked && linked.status === "open") {
+    try {
+      if (DB) await db(`UPDATE ${T.requests} SET status = 'closed' WHERE id = ?`, [linked.id]);
+      linked.status = "closed";
+      syncCalendar();
+    } catch { /* leave the request open; the poster can close it manually */ }
+  }
+
+  if (modalEl === host) closeModal();
+  if (savedNote) showError(savedNote);
+  else showNotice(`Logged ${minutesToLabel(entry.minutes)} — waiting for ${parentName} to confirm.${linked ? " Coverage request closed." : ""}`);
+
+  // Ask the parent to confirm (targeted, non-blocking).
+  sendHubNotification({
+    title: "Confirm babysitting hours",
+    body: `${me.name} logged ${minutesToLabel(entry.minutes)} of sitting for you.`,
+    audience: [entry.parent_id],
+    url: hubAppUrl(APP_ID, {}),
+  }).catch(() => {});
 }
 
 const ENTRY_CHANGED = "This entry changed, so nothing was confirmed. Check it again.";
@@ -410,7 +453,8 @@ async function confirmEntry(id) {
       showError(ENTRY_CHANGED);
       return;
     }
-    showError(e.message);
+    console.error(e);
+    showError(failureLine(e, { action: "confirm the hours", thing: "entry" }));
   }
 }
 
@@ -433,14 +477,14 @@ async function deleteEntry(id) {
       // when this member may not remove the row, so re-read instead.
       const res = await db(`DELETE FROM ${T.entries} WHERE id = ?`, [id]);
       if (res.changed === 0) {
-        await loadData().catch(() => {});
-        showError("Nothing was removed. This entry can no longer be changed.");
+        const found = await loadData().then(() => entries.some(x => x.id === id), (e) => { console.error(e); return null; });
+        showError(failureLine(null, { action: "remove the entry", thing: "entry", found }));
         return;
       }
     }
     entries = entries.filter(e => e.id !== id);
     showNotice(mine ? "Sitting withdrawn." : "Hours declined.");
-  } catch (e) { showError(e.message); }
+  } catch (e) { console.error(e); showError(failureLine(e, { action: "remove the entry", thing: "entry" })); }
 }
 
 /**
@@ -508,7 +552,8 @@ async function submitRequest() {
     }
   } catch (e) {
     if (btn) { btn.disabled = false; btn.textContent = "Post request"; }
-    showError(e.message);
+    console.error(e);
+    showError(failureLine(e, { action: "post the request", thing: "request" }));
   }
 }
 
@@ -524,7 +569,7 @@ async function claimRequest(requestId) {
         body: JSON.stringify({ slot_id: requestId }),
       });
       const json = await res.json().catch(() => null);
-      if (!res.ok || !json || typeof json !== "object" || json.error) { await loadData().catch(() => {}); showError(claimErrorMessage(json)); return; }
+      if (!res.ok || !json || typeof json !== "object" || json.error) { console.error(json?.error ?? res.status); await loadData().catch(() => {}); showError(claimErrorMessage(json, res.status)); return; }
       if (json.claim_id) claim.id = json.claim_id;
     }
     claims = [...claims, claim];
@@ -533,7 +578,7 @@ async function claimRequest(requestId) {
       title: "Coverage claimed", body: `${me.name} offered to cover "${request.title}".`,
       audience: [request.requester_id], url: hubAppUrl(APP_ID, {}),
     }).catch(() => {});
-  } catch (e) { await loadData().catch(() => {}); showError(e.message); }
+  } catch (e) { console.error(e); await loadData().catch(() => {}); showError(failureLine(e, { action: "claim the request", thing: "request" })); }
 }
 
 async function releaseRequest(requestId) {
@@ -546,33 +591,39 @@ async function releaseRequest(requestId) {
         body: JSON.stringify({ slot_id: requestId }),
       });
       const json = await res.json().catch(() => null);
-      if (!res.ok || !json || typeof json !== "object" || json.error) { showError(json.error || "Could not withdraw."); return; }
+      if (!res.ok || !json || typeof json !== "object" || json.error) { console.error(json?.error ?? res.status); showError(failureLine({ status: res.status, code: typeof json?.code === "string" ? json.code : undefined }, { action: "withdraw your offer", thing: "offer" })); return; }
     }
     claims = claims.filter(c => c.id !== mineClaim.id);
     showNotice("You withdrew your offer.");
-  } catch (e) { showError(e.message); }
+  } catch (e) { console.error(e); showError(failureLine(e, { action: "withdraw your offer", thing: "offer" })); }
 }
 
 async function closeRequest(requestId) {
   const request = requests.find(r => r.id === requestId);
   if (!request || request.requester_id !== me?.id) { showError("Only the poster can close a request."); return; }
   try {
-    if (DB) await db(`UPDATE ${T.requests} SET status = 'closed' WHERE id = ?`, [requestId]);
+    if (DB) {
+      const res = await db(`UPDATE ${T.requests} SET status = 'closed' WHERE id = ?`, [requestId]);
+      if (res.changed === 0) throw Object.assign(new Error("nothing changed"), { found: await rowFound(T.requests, requestId) });
+    }
     request.status = "closed";
     syncCalendar();
     showNotice("Request closed.");
-  } catch (e) { showError(e.message); }
+  } catch (e) { console.error(e); showError(failureLine(e, { action: "close the request", thing: "request", found: e?.found })); }
 }
 
 async function reopenRequest(requestId) {
   const request = requests.find(r => r.id === requestId);
   if (!request || request.requester_id !== me?.id) return;
   try {
-    if (DB) await db(`UPDATE ${T.requests} SET status = 'open' WHERE id = ?`, [requestId]);
+    if (DB) {
+      const res = await db(`UPDATE ${T.requests} SET status = 'open' WHERE id = ?`, [requestId]);
+      if (res.changed === 0) throw Object.assign(new Error("nothing changed"), { found: await rowFound(T.requests, requestId) });
+    }
     request.status = "open";
     syncCalendar();
     showNotice("Request reopened.");
-  } catch (e) { showError(e.message); }
+  } catch (e) { console.error(e); showError(failureLine(e, { action: "reopen the request", thing: "request", found: e?.found })); }
 }
 
 async function deleteRequest(requestId) {
@@ -581,12 +632,15 @@ async function deleteRequest(requestId) {
   const ok = await hubConfirm("Delete this coverage request?", { confirmLabel: "Delete", destructive: true });
   if (!ok) return;
   try {
-    if (DB) await db(`DELETE FROM ${T.requests} WHERE id = ?`, [requestId]);
+    if (DB) {
+      const res = await db(`DELETE FROM ${T.requests} WHERE id = ?`, [requestId]);
+      if (res.changed === 0) throw Object.assign(new Error("nothing changed"), { found: await rowFound(T.requests, requestId) });
+    }
     requests = requests.filter(r => r.id !== requestId);
     claims = claims.filter(c => c.request_id !== requestId);
     syncCalendar();
     showNotice("Request deleted.");
-  } catch (e) { showError(e.message); }
+  } catch (e) { console.error(e); showError(failureLine(e, { action: "delete the request", thing: "request", found: e?.found })); }
 }
 
 // ── Modals ────────────────────────────────────────────────────────────────────

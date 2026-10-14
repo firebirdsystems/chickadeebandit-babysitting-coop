@@ -159,13 +159,16 @@ export function canClaim(request, claims, meId) {
   return !(claims || []).some((c) => c.request_id === request.id && c.member_id === meId);
 }
 
-/** Map a slot_claims 409 reason to a human message. */
-export function claimErrorMessage(json) {
+/**
+ * Map a slot_claims refusal to a line: its 409 reasons get their own words,
+ * anything else the failureLine table by `status` — never the hub's text.
+ */
+export function claimErrorMessage(json, status) {
   switch (json && json.reason) {
     case "slot_full": return "Someone just claimed the last opening.";
     case "already_claimed": return "You already offered to cover this.";
     case "slot_closed": return "That request is no longer open.";
-    default: return (json && json.error) || "Could not claim that request.";
+    default: return failureLine({ status, code: typeof json?.code === "string" ? json.code : undefined }, { action: "claim the request", thing: "request" });
   }
 }
 
@@ -254,4 +257,50 @@ function statusLabel(status) {
   if (s === "closed") return "Covered";
   if (!s) return "Coverage";
   return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/**
+ * "Retry after a lost response" (app-template guide): whether a failed
+ * write's answer leaves its outcome unknown — no status, a 400, or a 5xx
+ * other than 507 — so the page reads the row back by its pinned id. A
+ * `UNIQUE_CONSTRAINT` answer is a 400 too: the usual retry of a create that
+ * landed collides on its own pinned id. Only finding the row under that id
+ * says it landed; not found keeps the usual failure line.
+ */
+export function outcomeUnknown(e) {
+  if (e?.code === "UNIQUE_CONSTRAINT" || /UNIQUE constraint failed/i.test(String(e?.message ?? ""))) return true;
+  const status = Number(e?.status) || 0;
+  return status === 0 || status === 400 || (status >= 500 && status !== 507);
+}
+
+/**
+ * Whether a stored row differs from what the form holds now, over the form's
+ * own fields only, compared as text with a missing value as empty.
+ */
+export function storedDiffers(row, fields) {
+  return Object.keys(fields).some((k) => String(row?.[k] ?? "") !== String(fields[k] ?? ""));
+}
+
+export const SAVED_AS_FIRST = "Saved as first entered — check it and update what changed.";
+
+/**
+ * The line a failed write shows ("Refused, gone, or failed" in the app-template
+ * guide): "try again" only when retrying can work. `action` and `thing` are the
+ * app's own words. `found` is the caller's re-read after a write that changed
+ * nothing: false = the row is gone, true = it is still there, null = the
+ * re-read failed. A row still there after a plain `WHERE id = ?` write means
+ * the row policy refused it; only a `guarded` write (one with a state
+ * condition) can have been "changed by someone else". Decided from the error's
+ * `status` / `code`, never from the hub's or the browser's text.
+ */
+export function failureLine(e, { action, thing, found, guarded = false } = {}) {
+  if (e?.forUser) return e.message;
+  if (e?.code === "UNIQUE_CONSTRAINT" || /UNIQUE constraint failed/i.test(String(e?.message ?? ""))) return `That ${thing} already exists.`;
+  if (e?.status === 403 || (found === true && !guarded)) return `You don’t have permission to ${action}.`;
+  if (e?.status === 507) return "The household’s storage is full — free up space first.";
+  if (e?.status === 429) return "Too many tries — wait a minute and try again.";
+  if (found === null) return `Couldn’t ${action} — try again.`;
+  if (found === false || (found === undefined && e?.status === 404)) return `This ${thing} has been removed.`;
+  if (found === true || e?.status === 409) return `This ${thing} was changed by someone else — check it first.`;
+  return `Couldn’t ${action} — try again.`;
 }
