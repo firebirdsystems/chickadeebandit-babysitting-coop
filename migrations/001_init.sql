@@ -13,7 +13,7 @@
 
 -- ── Coverage board ────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS app_babysitting_coop__coverage_requests (
-  id             TEXT PRIMARY KEY,
+  id             TEXT NOT NULL PRIMARY KEY,
   requester_id   TEXT NOT NULL,
   requester_name TEXT NOT NULL,
   title          TEXT NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS app_babysitting_coop__coverage_requests (
 
 -- Claims table is written ONLY by the slot_claims endpoints (see manifest).
 CREATE TABLE IF NOT EXISTS app_babysitting_coop__coverage_claims (
-  id         TEXT PRIMARY KEY,
+  id         TEXT NOT NULL PRIMARY KEY,
   request_id TEXT NOT NULL,
   member_id  TEXT NOT NULL,
   note       TEXT DEFAULT '',
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS app_babysitting_coop__coverage_claims (
 -- credit a third party. minutes stays encrypted at rest and is summed client-side
 -- (never filtered/sorted in SQL) so it needs no plaintext declaration.
 CREATE TABLE IF NOT EXISTS app_babysitting_coop__ledger_entries (
-  id          TEXT PRIMARY KEY,
+  id          TEXT NOT NULL PRIMARY KEY,
   sitter_id   TEXT NOT NULL,
   sitter_name TEXT NOT NULL,
   parent_id   TEXT NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS app_babysitting_coop__ledger_entries (
 -- value on ledger_entries can never make an entry count, because balances are
 -- derived solely from this table.
 CREATE TABLE IF NOT EXISTS app_babysitting_coop__ledger_agreements (
-  id            TEXT PRIMARY KEY,   -- same id as ledger_entries
+  id            TEXT NOT NULL PRIMARY KEY,   -- same id as ledger_entries
   sitter_id     TEXT NOT NULL,      -- copied from ledger_entries on init
   parent_id     TEXT NOT NULL,
   sitter_agreed INTEGER NOT NULL DEFAULT 0,
